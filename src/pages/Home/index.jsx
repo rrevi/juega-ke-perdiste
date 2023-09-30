@@ -56,7 +56,7 @@ export function Home() {
 							<th>Them</th>
 							<th>Us</th>
 							<th>
-								<button type="submit" class="newGameButton" onClick={newGameButtonClick}>New Game!</button>
+								<button type="submit" class="newGameButton" onClick={newGameButtonClick}>New!</button>
 							</th>
 						</tr>
 					</thead>

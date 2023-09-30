@@ -45,7 +45,6 @@ header img {
 main {
 	flex: auto;
 	display: flex;
-	max-width: 1280px;
 	padding-top: 0px;
 }
 

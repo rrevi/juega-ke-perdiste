@@ -11,6 +11,8 @@ export function Home() {
 		gameHands.push({them: parseInt(them), us: parseInt(us)})
 		setGameHands(gameHands)
 		setGameScore();
+		document.getElementById("them").value = ""
+		document.getElementById("us").value = ""
 	}, [])
 
 	function setGameScore() {
@@ -22,17 +24,27 @@ export function Home() {
 	}
 
 	function addHandButtonClick(e) {
-		let themInputScore = document.getElementById("them").value
-		let usInputScore = document.getElementById("us").value
+		let themInputScore = getThemScore() ? getThemScore() : 0
+		let usInputScore = getUsScore() ? getUsScore() : 0
+		console.log("themInputScore: " + themInputScore)
+		console.log("usInputScore: " + usInputScore)
 		if(themInputScore > 0 || usInputScore > 0) {
 			addHand(themInputScore, usInputScore)
 		}
 	}
 
 	function newGameButtonClick(e) {
-		setGameHands([])
+		gameHands.length = 0
 		setThemScore(0)
 		setUsScore(0)
+	}
+
+	function getThemScore() {
+		return document.getElementById("them").value
+	}
+
+	function getUsScore() {
+		return document.getElementById("us").value
 	}
 
 	return (
@@ -58,10 +70,10 @@ export function Home() {
 						))}
 						<tr>
 							<td>
-								<input type="number" id="them" name="them" value="0" min="0" max="168" />
+								<input type="number" id="them" name="them" placeholder="0" min="0" max="168" />
 							</td>
 							<td>
-								<input type="number" id="us" name="us" value="0" min="0" max="168" />
+								<input type="number" id="us" name="us" placeholder="0" min="0" max="168" />
 							</td>
 							<td>
 								<button type="submit" class="addHandButton" onClick={addHandButtonClick}>Add</button>

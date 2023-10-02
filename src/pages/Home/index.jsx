@@ -56,7 +56,7 @@ export function Home() {
 							<th>Them</th>
 							<th>Us</th>
 							<th>
-								<button type="submit" class="newGameButton" onClick={newGameButtonClick}>New!</button>
+								<button type="submit" class="newGameButton" onClick={newGameButtonClick}>&#8635;</button>
 							</th>
 						</tr>
 					</thead>
@@ -76,7 +76,7 @@ export function Home() {
 								<input type="number" id="us" name="us" placeholder="0" min="0" max="168" />
 							</td>
 							<td>
-								<button type="submit" class="addHandButton" onClick={addHandButtonClick}>Add</button>
+								<button type="submit" class="addHandButton" onClick={addHandButtonClick}>+</button>
 							</td>
 						</tr>
 					</tbody>

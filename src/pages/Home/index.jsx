@@ -53,8 +53,8 @@ export function Home() {
 				<table class="gameHands">
 					<thead>
 						<tr>
-							<th>Them</th>
-							<th>Us</th>
+							<th class="teamEmoji">&#x1F985;</th>
+							<th class="teamEmoji">&#x1F405;</th>
 							<th>
 								<button
 									type="submit"
@@ -84,7 +84,7 @@ export function Home() {
 									placeholder="0"
 									min="0"
 									max="168"
-									title="Them Hand Score" />
+									title="&#x1F985; Hand Score" />
 							</td>
 							<td>
 								<input
@@ -94,7 +94,7 @@ export function Home() {
 									placeholder="0"
 									min="0"
 									max="168"
-									title="Us Hand Score" />
+									title="&#x1F405; Hand Score" />
 							</td>
 							<td>
 								<button
@@ -110,8 +110,8 @@ export function Home() {
 					</tbody>
 					<tfoot>
 					<tr>
-						<th id="themTotalScore" title="Them Total Score">{themTotalScore}</th>
-						<th id="usTotalScore" title="Us Total Score">{usTotalScore}</th>
+						<th id="themTotalScore" title="&#x1F985; Total Score">{themTotalScore}</th>
+						<th id="usTotalScore" title="&#x1F405; Total Score">{usTotalScore}</th>
 						<th></th>
 					</tr>
 					</tfoot>

@@ -16,6 +16,12 @@ export function Home() {
 		document.getElementById("usHandScore")["value"] = ""
 	}, [])
 
+	const removeHand = useCallback((index) => {
+		gameHands.splice(index, 1)
+		setGameHands(gameHands)
+		setGameScore();
+	}, [])
+
 	function setGameScore() {
 		let themScore = 0
 		let usScore = 0
@@ -31,6 +37,11 @@ export function Home() {
 		if(themHandScore > 0 || usHandScore > 0) {
 			addHand(themHandScore, usHandScore)
 		}
+	}
+
+	function removeHandButtonClick(index) {
+		console.log("removeHandButtonClick - index: " + index)
+		removeHand(index)
 	}
 
 	function newGameButtonClick(e) {
@@ -68,11 +79,20 @@ export function Home() {
 						</tr>
 					</thead>
 					<tbody>
-						{gameHands.map(hand => (
+						{gameHands.map((hand, index) => (
 						<tr class="handRow">
 							<td>{hand.them}</td>
 							<td>{hand.us}</td>
-							<td></td>
+							<td>
+								<button
+									type="submit"
+									id="removeHandButton"
+									class="removeHandButton"
+									onClick={() => removeHandButtonClick(index)}
+									title="Add Hand">
+										-
+								</button>
+							</td>
 						</tr>
 						))}
 						<tr>

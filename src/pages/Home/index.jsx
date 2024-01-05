@@ -40,7 +40,6 @@ export function Home() {
 	}
 
 	function removeHandButtonClick(index) {
-		console.log("removeHandButtonClick - index: " + index)
 		removeHand(index)
 	}
 

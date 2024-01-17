@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import { useCallback, useState } from 'preact/hooks';
+import Hand from '../../components/Hand'
 import './style.css';
 
 export function Home() {
@@ -39,10 +40,6 @@ export function Home() {
 		}
 	}
 
-	function removeHandButtonClick(index) {
-		removeHand(index)
-	}
-
 	function newGameButtonClick(e) {
 		gameHands.length = 0
 		setThemTotalScore(0)
@@ -79,20 +76,10 @@ export function Home() {
 					</thead>
 					<tbody>
 						{gameHands.map((hand, index) => (
-						<tr class="handRow">
-							<td>{hand.them}</td>
-							<td>{hand.us}</td>
-							<td>
-								<button
-									type="submit"
-									id="removeHandButton"
-									class="removeHandButton"
-									onClick={() => removeHandButtonClick(index)}
-									title="Add Hand">
-										-
-								</button>
-							</td>
-						</tr>
+							<Hand
+								hand={hand}
+								onRemove={() => removeHand(index)}
+							/>
 						))}
 						<tr>
 							<td>

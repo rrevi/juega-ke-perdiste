@@ -2,7 +2,7 @@ import { expect } from 'expect';
 import { h } from 'preact';
 import { render, fireEvent, screen, waitFor } from '@testing-library/preact';
 
-import { Home } from '../src/pages/Home';
+import Home from '../src/pages/Home';
 
 describe('Home', () => {
   test('should display initial score', () => {

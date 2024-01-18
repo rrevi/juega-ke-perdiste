@@ -52,12 +52,32 @@ input {
 	color: #000;
 	text-align: center;
 	background-color: #e5cfae;
+	border: 1px solid #000;
+	text-indent: 17px;
+}
+
+input:hover, input:focus {
+	outline: solid #000;
 }
 
 button {
 	color: #000;
 	background-color: #e5cfae;
 	border-color: #000;
+}
+
+button:hover,
+button:enabled:hover,
+button:focus {
+	outline: solid #000;
+	background-color: #e5cfae;
+	border: 1px solid #000;
+}
+
+button:active, button:enabled:active {
+	outline: solid #000;
+	background-color: #fdeccd;
+	border: 1px solid #000;
 }
 
 @media (prefers-color-scheme: dark) {

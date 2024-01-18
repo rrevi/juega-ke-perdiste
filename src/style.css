@@ -60,10 +60,24 @@ input:hover, input:focus {
 	outline: solid #000;
 }
 
+input,
+select,
+textarea {
+	width: 195px;
+}
+
 button {
 	color: #000;
 	background-color: #e5cfae;
 	border-color: #000;
+}
+
+.button,
+button,
+input,
+select,
+textarea {
+	margin-bottom: 0;
 }
 
 button:hover,

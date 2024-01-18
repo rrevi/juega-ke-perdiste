@@ -100,3 +100,11 @@ button:active, button:enabled:active {
 		background-color: #fdeccd;
 	}
 }
+
+@media only screen and (max-width: 720px) {
+	input,
+	select,
+	textarea {
+		width: 100%;
+	}
+}

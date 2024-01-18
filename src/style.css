@@ -106,5 +106,6 @@ button:active, button:enabled:active {
 	select,
 	textarea {
 		width: 100%;
+		text-indent: 0px;
 	}
 }

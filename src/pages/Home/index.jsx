@@ -37,9 +37,6 @@ export default class Home extends Component {
 		let { gameHands } = this.state;
 		gameHands.length = 0
 		this.setState({ gameHands });
-
-		// setThemTotalScore(0)
-		// setUsTotalScore(0)
 	}
 
 	getThemHandScore = () => {

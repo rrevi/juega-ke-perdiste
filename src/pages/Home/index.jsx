@@ -1,5 +1,4 @@
 import { h, Component } from 'preact';
-import { useCallback, useState } from 'preact/hooks';
 import Hand from '../../components/Hand'
 import './style.css';
 
@@ -14,8 +13,8 @@ export default class Home extends Component {
 		let { gameHands } = this.state;
 		gameHands.push({them: parseInt(them), us: parseInt(us)});
 		this.setState({ gameHands });
-		document.getElementById("themHandScore")["value"] = ""
-		document.getElementById("usHandScore")["value"] = ""
+		document.getElementById("themHandScore")["value"] = "";
+		document.getElementById("usHandScore")["value"] = "";
 	};
 
 	removeHand = (index) => {
@@ -25,33 +24,33 @@ export default class Home extends Component {
 	}
 
 	addHandButtonClick = () => {
-		let themHandScore = this.getThemHandScore() ? this.getThemHandScore() : 0
-		let usHandScore = this.getUsHandScore() ? this.getUsHandScore() : 0
+		let themHandScore = this.getThemHandScore() ? this.getThemHandScore() : 0;
+		let usHandScore = this.getUsHandScore() ? this.getUsHandScore() : 0;
 
 		if(themHandScore > 0 || usHandScore > 0) {
-			this.addHand(themHandScore, usHandScore)
+			this.addHand(themHandScore, usHandScore);
 		}
 	}
 
 	newGameButtonClick = () => {
 		let { gameHands } = this.state;
-		gameHands.length = 0
+		gameHands.length = 0;
 		this.setState({ gameHands });
 	}
 
 	getThemHandScore = () => {
-		return document.getElementById("themHandScore")["value"]
+		return document.getElementById("themHandScore")["value"];
 	}
 
 	getUsHandScore = () => {
-		return document.getElementById("usHandScore")["value"]
+		return document.getElementById("usHandScore")["value"];
 	}
 
 	render(props, state) {
-		let themTotalScore = 0
-		let usTotalScore = 0
-		let { gameHands } = state
-		gameHands.forEach(hand => { themTotalScore += hand.them; usTotalScore += hand.us })
+		let themTotalScore = 0;
+		let usTotalScore = 0;
+		let { gameHands } = state;
+		gameHands.forEach(hand => { themTotalScore += hand.them; usTotalScore += hand.us });
 		return (
 			<div class="home">
 				<section>

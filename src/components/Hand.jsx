@@ -5,8 +5,8 @@ export default class Hand extends Component {
 	render(props) {
     return (
       <tr class="handRow">
-        <td>{props.hand.them}</td>
-        <td>{props.hand.us}</td>
+        <td>{props.hand.themScore}</td>
+        <td>{props.hand.usScore}</td>
         <td>
           <button
             type="submit"

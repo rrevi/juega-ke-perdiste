@@ -1,5 +1,5 @@
 {
-	"name": "example",
+	"name": "juega-ke-perdiste",
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -9,6 +9,7 @@
 		"test": "jest"
 	},
 	"dependencies": {
+		"nanoid": "^3.3.6",
 		"preact": "^10.13.1",
 		"preact-iso": "^2.3.1"
 	},

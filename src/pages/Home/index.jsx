@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import HandModel from '../../models/HandModel'
 import Hand from '../../components/Hand'
 import './style.css';
 
@@ -6,21 +7,18 @@ export default class Home extends Component {
 
 	constructor() {
 		super();
-		this.state = { gameHands: [] };
+		this.model = new HandModel('jkp-hands', () => this.setState({}));
 	};
 	
 	addHand = (them, us) => {
-		let { gameHands } = this.state;
-		gameHands.push({them: parseInt(them), us: parseInt(us)});
-		this.setState({ gameHands });
+		this.model.add(parseInt(them), parseInt(us));
+
 		document.getElementById("themHandScore")["value"] = "";
 		document.getElementById("usHandScore")["value"] = "";
 	};
 
-	removeHand = (index) => {
-		let { gameHands } = this.state;
-		gameHands.splice(index, 1);
-		this.setState({ gameHands });
+	removeHand = (hand) => {
+		this.model.destroy(hand);
 	}
 
 	addHandButtonClick = () => {
@@ -33,9 +31,7 @@ export default class Home extends Component {
 	}
 
 	newGameButtonClick = () => {
-		let { gameHands } = this.state;
-		gameHands.length = 0;
-		this.setState({ gameHands });
+		this.model.destroyAll();
 	}
 
 	getThemHandScore = () => {
@@ -47,10 +43,8 @@ export default class Home extends Component {
 	}
 
 	render(props, state) {
-		let themTotalScore = 0;
-		let usTotalScore = 0;
-		let { gameHands } = state;
-		gameHands.forEach(hand => { themTotalScore += hand.them; usTotalScore += hand.us });
+		let { hands}  = this.model;
+		let [themTotalScore, usTotalScore] = this.model.totalScores();
 		return (
 			<div class="home">
 				<section>
@@ -72,10 +66,10 @@ export default class Home extends Component {
 							</tr>
 						</thead>
 						<tbody>
-							{state.gameHands.map((hand, index) => (
+							{hands.map( hand => (
 								<Hand
 									hand={hand}
-									onRemove={() => this.removeHand(index)}
+									onRemove={() => this.removeHand(hand)}
 								/>
 							))}
 							<tr>

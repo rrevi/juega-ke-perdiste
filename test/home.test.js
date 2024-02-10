@@ -5,6 +5,10 @@ import { render, fireEvent, screen, waitFor } from '@testing-library/preact';
 import Home from '../src/pages/Home';
 
 describe('Home', () => {
+  afterEach(() => {
+    fireEvent.click(screen.getByText("↻"));
+  });
+
   test('should display initial score', () => {
     render(<Home />);
 

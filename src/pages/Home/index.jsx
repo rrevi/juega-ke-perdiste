@@ -75,20 +75,24 @@ export default class Home extends Component {
 							<tr>
 								<td>
 									<input
-										type="number"
 										id="themHandScore"
 										name="themHandScore"
 										placeholder="0"
+										type="number"
+										inputmode="numeric"
+										pattern="[0-9]*"
 										min="0"
 										max="168"
 										title="&#x1F985; Hand Score" />
 								</td>
 								<td>
 									<input
-										type="number"
 										id="usHandScore"
 										name="usHandScore"
 										placeholder="0"
+										type="number"
+										inputmode="numeric"
+										pattern="[0-9]*"
 										min="0"
 										max="168"
 										title="&#x1F405; Hand Score" />

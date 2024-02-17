@@ -1,34 +1,69 @@
-import { uuid, store } from './util';
+import PouchDB from 'pouchdb';
 
 export default class HandModel {
-  constructor(key, sub) {
-    this.key = key;
-    this.hands = store(key) || [];
-    this.onChanges = [sub];
+  constructor(dbName) {
+    let self = this;
+
+    this.dbName = dbName;
+    this.hands = [];
+    this.onChanges = [];
+
+    this.localDB = new PouchDB(this.dbName);
+    this.localDB.changes({
+      since: 'now',
+      live: true
+    }).on('change', function () {
+      self.draw();
+    }).on('error', function (err) {
+      console.log('localDB.error: ', err);
+    });
+
+    this.draw();
+  }
+
+  draw() {
+    let self = this;
+    // @ts-ignore
+    this.localDB.allDocs({ include_docs: true }, function (err, doc) {
+      let next_hands = doc.rows.map(hand => hand.doc);
+      self.hands = next_hands;
+      self.inform();
+    });
+  }
+
+  subscribe(fn) {
+    this.onChanges.push(fn);
   }
 
   inform() {
-    store(this.key, this.hands);
     this.onChanges.forEach( cb => cb() );
   }
 
   add(themScore, usScore) {
-    this.hands = this.hands.concat({
-      id: uuid(),
-      themScore,
-      usScore
+    let hand = {
+      "_id": Date.now().toString(),
+      "themScore": themScore,
+      "usScore": usScore
+    };
+    
+    // @ts-ignore
+    this.localDB.put(hand, function callback(err, result){
+      if(!err) {
+        console.log('Succesfully saved hand!');
+      }
     });
-    this.inform();
   }
 
   destroy(hand) {
-    this.hands = this.hands.filter( h => h !== hand );
-    this.inform();
+    this.localDB.remove(hand);
   }
 
   destroyAll() {
-    this.hands = this.hands.filter( h => false );
-    this.inform();
+    this.deleted_hands = this.hands.filter( hand => { 
+      hand._deleted = true;
+      return hand;
+    });
+    this.localDB.bulkDocs(this.deleted_hands);
   }
 
   totalScores() {

@@ -7,7 +7,8 @@ export default class Home extends Component {
 
 	constructor() {
 		super();
-		this.model = new HandModel('jkp-hands', () => this.setState({}));
+		this.model = new HandModel('jkp-hands');
+		this.model.subscribe(() => this.setState({}));
 	};
 	
 	addHand = (them, us) => {

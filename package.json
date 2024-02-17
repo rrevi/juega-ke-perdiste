@@ -9,7 +9,8 @@
 		"test": "jest"
 	},
 	"dependencies": {
-		"nanoid": "^3.3.6",
+		"events": "^3.3.0",
+		"pouchdb": "^8.0.1",
 		"preact": "^10.13.1",
 		"preact-iso": "^2.3.1"
 	},

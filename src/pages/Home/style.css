@@ -1,15 +1,10 @@
 .home {
-	color: #000;
+	color: var(--text);
 	width: 100%;
 }
 
-.home img {
-	margin-bottom: 1.5rem;
-	filter: drop-shadow(0 0 2em #000);
-}
-
 .home section {
-	margin: 0 0;
+	margin: 0;
 }
 
 .gameHands {
@@ -23,19 +18,25 @@
 
 .gameHands td {
 	padding: 10px;
-	border: 0px;
-	background-color: #fdeccd;
+	border: 0;
+	background-color: var(--bg);
 	text-align: center;
 }
 
+.gameHands td .inputWrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+}
+
 .gameHands thead tr {
-	border-bottom: 2px solid #e5cfae;
+	border-bottom: 2px solid var(--surface);
 }
 
 .gameHands thead tr th {
 	padding: 10px;
-	border: 0px;
-	background-color: #fdeccd;
+	border: 0;
+	background-color: var(--bg);
 	text-align: center;
 }
 
@@ -44,19 +45,112 @@
 }
 
 .gameHands tfoot tr {
-	border-top: 2px solid #e5cfae;
+	border-top: 2px solid var(--surface);
 }
 
 .gameHands tfoot tr th {
 	padding: 10px;
-	border: 0px;
-	background-color: #fdeccd;
+	border: 0;
+	background-color: var(--bg);
 	text-align: center;
+}
+
+.winnerBanner {
+	position: fixed;
+	inset: 0;
+	background: var(--winner-bg);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	animation: fadeIn 0.4s ease;
+}
+
+.winnerEmoji {
+	font-size: 80px;
+	border-radius: 50%;
+	padding: 1.5rem;
+	animation: bounce 1.2s ease infinite, pulseGlow 2s ease infinite;
+}
+
+.winnerText {
+	font-size: 2rem;
+	font-weight: bold;
+	margin: 1.5rem 0 2rem;
+}
+
+.winnerActions {
+	display: flex;
+	gap: 1rem;
+}
+
+.winnerActions button {
+	padding: 0.6rem 1.5rem;
+	font-size: 1rem;
+	border: 2px solid var(--border);
+	border-radius: 4px;
+	min-height: 44px;
+}
+
+.winnerActions button:hover {
+	background-color: var(--accent);
+}
+
+.winnerConfetti {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.confetti {
+	position: absolute;
+	top: -10px;
+	animation: confettiFall linear infinite;
+}
+
+.handRow td {
+	padding: 10px;
+	border: 0;
+	background-color: var(--bg);
+	text-align: center;
+}
+
+.handRow .removeHandButton {
+	min-width: 44px;
+	min-height: 44px;
+	padding: 0.4rem;
+	font-size: 1.2rem;
+}
+
+.newGameButton {
+	min-width: 44px;
+	min-height: 44px;
+	font-size: 1.2rem;
+}
+
+.addHandButton {
+	min-width: 44px;
+	min-height: 44px;
+	font-size: 1.2rem;
+	font-weight: bold;
 }
 
 @media (max-width: 639px) {
 	.home section {
 		grid-template-columns: 1fr;
 		row-gap: 1rem;
+	}
+
+	.winnerEmoji {
+		font-size: 60px;
+	}
+
+	.winnerText {
+		font-size: 1.5rem;
 	}
 }

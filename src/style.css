@@ -1,7 +1,16 @@
 :root {
-	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-	background-color: #fdeccd;
+	--bg: #fdeccd;
+	--surface: #e5cfae;
+	--surface-hover: #e8c2a0;
+	--text: #000000;
+	--text-secondary: #555555;
+	--border: #000000;
+	--accent: #978d89;
+	--accent-hover: #96796d;
+	--error: #e74c3c;
+	--winner-bg: rgba(253, 236, 205, 0.95);
 
+	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 	font-synthesis: none;
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
@@ -9,9 +18,56 @@
 	-webkit-text-size-adjust: 100%;
 }
 
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: #2a2520;
+		--surface: #3d3630;
+		--surface-hover: #4a4240;
+		--text: #ece4d8;
+		--text-secondary: #b8ad9f;
+		--border: #ece4d8;
+		--accent: #d98e79;
+		--accent-hover: #e8775a;
+		--error: #ff6b6b;
+		--winner-bg: rgba(42, 37, 32, 0.95);
+	}
+}
+
+@keyframes shake {
+	0%, 100% { transform: translateX(0); }
+	10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+	20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+	from { transform: scale(0.5); opacity: 0; }
+	to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bounce {
+	0%, 100% { transform: translateY(0) scale(1); }
+	50% { transform: translateY(-20px) scale(1.1); }
+}
+
+@keyframes confettiFall {
+	0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+	100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes pulseGlow {
+	0%, 100% { box-shadow: 0 0 30px var(--accent); }
+	50% { box-shadow: 0 0 60px var(--accent), 0 0 90px var(--accent); }
+}
+
 body {
 	margin: 0;
-	background-color: #fdeccd;
+	background-color: var(--bg);
+	color: var(--text);
 	display: block;
 }
 
@@ -24,9 +80,9 @@ body {
 
 header {
 	display: flex;
-	background-color: #e5cfae;
+	background-color: var(--surface);
 	padding: 5px;
-	height: 100px;;
+	height: 100px;
 }
 
 header h4 {
@@ -34,30 +90,60 @@ header h4 {
 }
 
 header .headerTitle {
-	color: #000;
+	color: var(--text);
 	margin-left: 20px;
 }
 
 header img {
-	filter: drop-shadow(0 0 2em #000);
+	filter: drop-shadow(0 0 2em var(--accent));
+}
+
+@media (prefers-color-scheme: dark) {
+	header img {
+		filter: brightness(0.65) drop-shadow(0 0 2em #998877);
+	}
 }
 
 main {
 	flex: auto;
 	display: flex;
-	padding-top: 0px;
+	padding-top: 0;
+}
+
+label {
+	display: block;
+	color: var(--text-secondary);
+	margin-bottom: 0.4rem;
+	font-size: 0.85rem;
+}
+
+label.invalid {
+	color: var(--error);
 }
 
 input {
-	color: #000;
+	font-size: 1rem;
+	color: var(--text);
 	text-align: center;
-	background-color: #e5cfae;
-	border: 1px solid #000;
+	background-color: var(--surface);
+	border: 1px solid var(--border);
 	text-indent: 17px;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-input:hover, input:focus {
-	outline: solid #000;
+input:hover {
+	border-color: var(--accent);
+}
+
+input:focus {
+	outline: none;
+	border-color: var(--accent);
+	box-shadow: 0 0 0 2px var(--accent);
+}
+
+input.invalid {
+	border-color: var(--error);
+	animation: shake 0.4s ease-in-out;
 }
 
 input,
@@ -67,9 +153,11 @@ textarea {
 }
 
 button {
-	color: #000;
-	background-color: #e5cfae;
-	border-color: #000;
+	color: var(--text);
+	background-color: var(--surface);
+	border-color: var(--border);
+	cursor: pointer;
+	transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .button,
@@ -83,22 +171,17 @@ textarea {
 button:hover,
 button:enabled:hover,
 button:focus {
-	outline: solid #000;
-	background-color: #e5cfae;
-	border: 1px solid #000;
+	outline: solid var(--border);
+	background-color: var(--surface-hover);
+	border: 1px solid var(--border);
 }
 
-button:active, button:enabled:active {
-	outline: solid #000;
-	background-color: #fdeccd;
-	border: 1px solid #000;
-}
-
-@media (prefers-color-scheme: dark) {
-	:root {
-		color: #000;
-		background-color: #fdeccd;
-	}
+button:active,
+button:enabled:active {
+	outline: solid var(--border);
+	background-color: var(--bg);
+	border: 1px solid var(--border);
+	transform: scale(0.97);
 }
 
 @media only screen and (max-width: 720px) {
@@ -106,6 +189,6 @@ button:active, button:enabled:active {
 	select,
 	textarea {
 		width: 100%;
-		text-indent: 0px;
+		text-indent: 0;
 	}
 }

@@ -1,9 +1,6 @@
 import dominoLogo from '../assets/domino.svg';
-import { useLocation } from 'preact-iso';
 
 export function Header() {
-	const { url } = useLocation();
-
 	return (
 		<header>
 			<div class="headerLogo">

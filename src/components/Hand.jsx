@@ -1,23 +1,20 @@
-import { h, Component } from "preact";
+import { h } from "preact";
 
-export default class Hand extends Component {
-
-	render(props) {
-    return (
-      <tr class="handRow">
-        <td>{props.hand.themScore}</td>
-        <td>{props.hand.usScore}</td>
-        <td>
-          <button
-            type="submit"
-            id="removeHandButton"
-            class="removeHandButton"
-            onClick={props.onRemove}
-            title="Add Hand">
-              -
-          </button>
-        </td>
-      </tr>
-    );
-  }
+export default function Hand({ hand, onRemove }) {
+	return (
+		<tr class="handRow">
+			<td>{hand.themScore}</td>
+			<td>{hand.usScore}</td>
+			<td>
+				<button
+					type="button"
+					class="removeHandButton"
+					onClick={onRemove}
+					title="Remove Hand"
+					aria-label="Remove Hand">
+					-
+				</button>
+			</td>
+		</tr>
+	);
 }

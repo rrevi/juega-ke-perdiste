@@ -179,7 +179,7 @@ export default class Home extends Component {
 						<tr>
 							<th id="themTotalScore" title="&#x1F985; Total Score" aria-live="polite">{themTotalScore}</th>
 							<th id="usTotalScore" title="&#x1F405; Total Score" aria-live="polite">{usTotalScore}</th>
-							<th></th>
+							<th />
 						</tr>
 						</tfoot>
 					</table>

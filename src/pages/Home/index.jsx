@@ -12,6 +12,13 @@ export default class Home extends Component {
 
 	constructor() {
 		super();
+		this.state = {
+			themInput: '',
+			usInput: '',
+			themError: false,
+			usError: false,
+			winner: null,
+		};
 		this.model = new HandModel('jkp-hands');
 		this.model.subscribe(() => {
 			const [themTotal, usTotal] = this.model.totalScores();
@@ -20,14 +27,7 @@ export default class Home extends Component {
 			else if (usTotal >= WIN_SCORE) winner = 'us';
 			this.setState({ winner });
 		});
-		this.state = {
-			themInput: '',
-			usInput: '',
-			themError: false,
-			usError: false,
-			winner: null,
-		};
-	};
+	}
 
 	themInputChange = (e) => {
 		this.setState({ themInput: e.target.value, themError: false });

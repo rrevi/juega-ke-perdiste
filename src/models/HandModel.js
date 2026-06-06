@@ -56,6 +56,7 @@ export default class HandModel {
 
   destroy(hand) {
     this.localDB.remove(hand);
+    this.hands = this.hands.filter( h => h !== hand);
   }
 
   destroyAll() {
@@ -64,6 +65,7 @@ export default class HandModel {
       return hand;
     });
     this.localDB.bulkDocs(this.deleted_hands);
+    this.hands = [];
   }
 
   totalScores() {

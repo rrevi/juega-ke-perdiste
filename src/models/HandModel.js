@@ -2,8 +2,6 @@ import PouchDB from 'pouchdb';
 
 export default class HandModel {
   constructor(dbName) {
-    let self = this;
-
     this.dbName = dbName;
     this.hands = [];
     this.onChanges = [];
@@ -12,23 +10,19 @@ export default class HandModel {
     this.localDB.changes({
       since: 'now',
       live: true
-    }).on('change', function () {
-      self.draw();
-    }).on('error', function (err) {
+    }).on('change', () => {
+      this.draw();
+    }).on('error', (err) => {
       console.log('localDB.error: ', err);
     });
 
     this.draw();
   }
 
-  draw() {
-    let self = this;
-    // @ts-ignore
-    this.localDB.allDocs({ include_docs: true }, function (err, doc) {
-      let next_hands = doc.rows.map(hand => hand.doc);
-      self.hands = next_hands;
-      self.inform();
-    });
+  async draw() {
+    const { rows } = await this.localDB.allDocs({ include_docs: true });
+    this.hands = rows.map(row => row.doc);
+    this.inform();
   }
 
   subscribe(fn) {
@@ -39,19 +33,15 @@ export default class HandModel {
     this.onChanges.forEach( cb => cb() );
   }
 
-  add(themScore, usScore) {
-    let hand = {
+  async add(themScore, usScore) {
+    const hand = {
       "_id": Date.now().toString(),
       "themScore": themScore,
       "usScore": usScore
     };
-    
-    // @ts-ignore
-    this.localDB.put(hand, function callback(err, result){
-      if(!err) {
-        console.log('Succesfully saved hand!');
-      }
-    });
+
+    await this.localDB.put(hand);
+    console.log('Successfully saved hand!');
   }
 
   destroy(hand) {

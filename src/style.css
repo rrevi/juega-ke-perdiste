@@ -24,7 +24,7 @@
 		--surface: #3d3630;
 		--surface-hover: #4a4240;
 		--text: #ece4d8;
-		--text-secondary: #b8ad9f;
+		--text-secondary: #c4b9ab;
 		--border: #ece4d8;
 		--accent: #d98e79;
 		--accent-hover: #e8775a;
@@ -171,6 +171,29 @@ button:enabled:active {
 	background-color: var(--bg);
 	border: 1px solid var(--border);
 	transform: scale(0.97);
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
 }
 
 @media only screen and (max-width: 720px) {

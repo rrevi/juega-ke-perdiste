@@ -1,4 +1,4 @@
-import { h, Component } from 'preact';
+import { h, Component, createRef } from 'preact';
 import HandModel from '../../models/HandModel';
 import Hand from '../../components/Hand';
 import './style.css';
@@ -20,6 +20,8 @@ export default class Home extends Component {
 			winner: null,
 		};
 		this.model = new HandModel('jkp-hands');
+		this.themInputRef = createRef();
+		this.winnerModalRef = createRef();
 		this.model.subscribe(() => {
 			const [themTotal, usTotal] = this.model.totalScores();
 			let winner = null;
@@ -27,6 +29,12 @@ export default class Home extends Component {
 			else if (usTotal >= WIN_SCORE) winner = 'us';
 			this.setState({ winner });
 		});
+	}
+
+	componentDidUpdate(prevState) {
+		if (!prevState.winner && this.state.winner) {
+			this.winnerModalRef.current?.focus();
+		}
 	}
 
 	themInputChange = (e) => {
@@ -59,6 +67,9 @@ export default class Home extends Component {
 		if (them > 0 || us > 0) {
 			this.addHand(them, us);
 			this.setState({ themInput: '', usInput: '' });
+			requestAnimationFrame(() => {
+				this.themInputRef.current?.focus();
+			});
 		}
 	};
 
@@ -69,6 +80,34 @@ export default class Home extends Component {
 
 	dismissWinner = () => {
 		this.setState({ winner: null });
+		requestAnimationFrame(() => {
+			this.themInputRef.current?.focus();
+		});
+	};
+
+	handleWinnerKeyDown = (e) => {
+		if (e.key === 'Escape') {
+			this.dismissWinner();
+			return;
+		}
+		if (e.key === 'Tab') {
+			const focusable = this.winnerModalRef.current?.querySelectorAll('button');
+			if (focusable && focusable.length > 0) {
+				const first = focusable[0];
+				const last = focusable[focusable.length - 1];
+				if (e.shiftKey) {
+					if (document.activeElement === first) {
+						e.preventDefault();
+						last.focus();
+					}
+				} else {
+					if (document.activeElement === last) {
+						e.preventDefault();
+						first.focus();
+					}
+				}
+			}
+		}
 	};
 
 	render(props, state) {
@@ -131,6 +170,7 @@ export default class Home extends Component {
 								<td>
 									<div class="inputWrapper">
 										<input
+											ref={this.themInputRef}
 											id="themHandScore"
 											name="themHandScore"
 											value={state.themInput}
@@ -185,8 +225,27 @@ export default class Home extends Component {
 					</table>
 				</section>
 
+				<div
+					id="scoreAnnouncer"
+					aria-live="assertive"
+					aria-atomic="true"
+					class="sr-only"
+				>
+					{state.winner
+						? `Winner! ${state.winner === 'them' ? 'Eagle' : 'Cat'} team has won the game!`
+						: ''}
+				</div>
+
 				{state.winner && (
-					<div class="winnerBanner" role="dialog" aria-label="Winner announcement">
+					<div
+						class="winnerBanner"
+						role="dialog"
+						aria-label="Winner announcement"
+						aria-modal="true"
+						tabIndex="-1"
+						ref={this.winnerModalRef}
+						onKeyDown={this.handleWinnerKeyDown}
+					>
 						<div class="winnerConfetti">
 							{confetti}
 						</div>

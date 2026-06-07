@@ -5,6 +5,7 @@
 
 .home section {
 	margin: 0;
+	border-bottom: 0;
 }
 
 .gameHands {
@@ -152,5 +153,11 @@
 
 	.winnerText {
 		font-size: 1.5rem;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	.gameHands {
+		box-shadow: 0 0 20px #998877;
 	}
 }

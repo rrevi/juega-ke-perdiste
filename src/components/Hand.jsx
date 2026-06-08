@@ -10,8 +10,8 @@ export default function Hand({ hand, onRemove }) {
 					type="button"
 					class="removeHandButton"
 					onClick={onRemove}
-					title="Remove Hand"
-					aria-label="Remove Hand">
+					title="Eliminar Mano"
+					aria-label="Eliminar Mano">
 					-
 				</button>
 			</td>

@@ -151,8 +151,8 @@ export default class Home extends Component {
 										id="newGameButton"
 										class="newGameButton"
 										onClick={this.newGameButtonClick}
-										title="New Game"
-										aria-label="New Game">
+										title="Nuevo Juego"
+										aria-label="Nuevo Juego">
 											&#8635;
 									</button>
 								</th>
@@ -182,7 +182,7 @@ export default class Home extends Component {
 											min="0"
 											max="168"
 											class={state.themError ? 'invalid' : ''}
-											title="&#x1F985; Hand Score" />
+											title="&#x1F985; Puntos de la Mano" />
 									</div>
 								</td>
 								<td>
@@ -199,7 +199,7 @@ export default class Home extends Component {
 											min="0"
 											max="168"
 											class={state.usError ? 'invalid' : ''}
-											title="&#x1F405; Hand Score" />
+											title="&#x1F405; Puntos de la Mano" />
 									</div>
 								</td>
 								<td>
@@ -208,8 +208,8 @@ export default class Home extends Component {
 										id="addHandButton"
 										class="addHandButton"
 										onClick={this.addHandButtonClick}
-										title="Add Hand"
-										aria-label="Add Hand">
+										title="Agregar Mano"
+										aria-label="Agregar Mano">
 											+
 									</button>
 								</td>
@@ -217,8 +217,8 @@ export default class Home extends Component {
 						</tbody>
 						<tfoot>
 						<tr>
-							<th id="themTotalScore" title="&#x1F985; Total Score" aria-live="polite">{themTotalScore}</th>
-							<th id="usTotalScore" title="&#x1F405; Total Score" aria-live="polite">{usTotalScore}</th>
+							<th id="themTotalScore" title="&#x1F985; Puntaje Total" aria-live="polite">{themTotalScore}</th>
+							<th id="usTotalScore" title="&#x1F405; Puntaje Total" aria-live="polite">{usTotalScore}</th>
 							<th />
 						</tr>
 						</tfoot>
@@ -232,7 +232,7 @@ export default class Home extends Component {
 					class="sr-only"
 				>
 					{state.winner
-						? `Winner! ${state.winner === 'them' ? 'Eagle' : 'Cat'} team has won the game!`
+						? `¡Ganador! ¡El equipo ${state.winner === 'them' ? 'Águilas' : 'Tigres'} ha ganado la partida!`
 						: ''}
 				</div>
 
@@ -240,9 +240,9 @@ export default class Home extends Component {
 					<div
 						class="winnerBanner"
 						role="dialog"
-						aria-label="Winner announcement"
+						aria-label="Anuncio de ganador"
 						aria-modal="true"
-						tabIndex="-1"
+						tabIndex={-1}
 						ref={this.winnerModalRef}
 						onKeyDown={this.handleWinnerKeyDown}
 					>
@@ -252,13 +252,13 @@ export default class Home extends Component {
 						<div class="winnerEmoji">
 							{state.winner === 'them' ? '\u{1F985}' : '\u{1F405}'}
 						</div>
-						<h2 class="winnerText">Winner!</h2>
+						<h2 class="winnerText">¡Ganador!</h2>
 						<div class="winnerActions">
-							<button onClick={this.dismissWinner}>Continue</button>
+							<button onClick={this.dismissWinner}>Continuar</button>
 							<button onClick={() => {
 								this.dismissWinner();
 								this.newGameButtonClick();
-							}}>New Game</button>
+							}}>Nuevo Juego</button>
 						</div>
 					</div>
 				)}

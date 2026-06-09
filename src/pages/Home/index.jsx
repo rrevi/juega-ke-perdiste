@@ -145,10 +145,11 @@ export default class Home extends Component {
 			<div class="home">
 				<section>
 					<table class="gameHands">
+						<caption class="sr-only">Tabla de puntaje de dominó</caption>
 						<thead>
 							<tr>
-								<th class="teamEmoji">&#x1F985;</th>
-								<th class="teamEmoji">&#x1F405;</th>
+								<th class="teamEmoji">&#x1F985;<span class="sr-only">Águila</span></th>
+								<th class="teamEmoji">&#x1F405;<span class="sr-only">Tigre</span></th>
 								<th>
 									<button
 										type="button"

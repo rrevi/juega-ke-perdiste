@@ -225,17 +225,6 @@ export default class Home extends Component {
 					</table>
 				</section>
 
-				<div
-					id="scoreAnnouncer"
-					aria-live="assertive"
-					aria-atomic="true"
-					class="sr-only"
-				>
-					{state.winner
-						? `¡Ganador! ¡El equipo ${state.winner === 'them' ? 'Águilas' : 'Tigres'} ha ganado la partida!`
-						: ''}
-				</div>
-
 				{state.winner && (
 					<div
 						class="winnerBanner"

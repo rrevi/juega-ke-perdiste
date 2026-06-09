@@ -37,6 +37,10 @@ export default class Home extends Component {
 		}
 	}
 
+  componentWillUnmount() {
+		this.model.dispose();
+	}
+
 	themInputChange = (e) => {
 		this.setState({ themInput: e.target.value, themError: false });
 	};

@@ -7,13 +7,12 @@ export default class HandModel {
     this.onChanges = [];
 
     this.localDB = new PouchDB(this.dbName);
-    this.localDB.changes({
+    this.changesFeed = this.localDB.changes({
       since: 'now',
       live: true
     }).on('change', () => {
       this.draw();
-    }).on('error', (err) => {
-      console.log('localDB.error: ', err);
+    }).on('error', () => {
     });
 
     this.draw();
@@ -27,6 +26,9 @@ export default class HandModel {
 
   subscribe(fn) {
     this.onChanges.push(fn);
+    return () => {
+      this.onChanges = this.onChanges.filter(f => f !== fn);
+    };
   }
 
   inform() {
@@ -41,7 +43,6 @@ export default class HandModel {
     };
 
     await this.localDB.put(hand);
-    console.log('Successfully saved hand!');
   }
 
   async destroy(hand) {
@@ -49,12 +50,20 @@ export default class HandModel {
     this.hands = this.hands.filter( h => h !== hand);
   }
 
-destroyAll() {
+  destroyAll() {
     const deleted_hands = this.hands.map(hand => {
       return Object.assign({}, hand, { _deleted: true });
     });
     this.localDB.bulkDocs(deleted_hands);
     this.hands = [];
+  }
+
+  dispose() {
+    if (this.changesFeed) {
+      this.changesFeed.cancel();
+      this.changesFeed = null;
+    }
+    this.onChanges = [];
   }
 
   totalScores() {

@@ -11,7 +11,7 @@ export default function Hand({ hand, onRemove }) {
 					class="removeHandButton"
 					onClick={onRemove}
 					title="Eliminar Mano"
-					aria-label="Eliminar Mano">
+					aria-label={`Eliminar mano: 🦅 ${hand.themScore}, 🐅 ${hand.usScore}`}>
 					-
 				</button>
 			</td>

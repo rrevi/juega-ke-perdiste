@@ -35,7 +35,7 @@ export default class HandModel {
 
   async add(themScore, usScore) {
     const hand = {
-      "_id": Date.now().toString(),
+      _id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       "themScore": themScore,
       "usScore": usScore
     };
@@ -44,17 +44,16 @@ export default class HandModel {
     console.log('Successfully saved hand!');
   }
 
-  destroy(hand) {
-    this.localDB.remove(hand);
+  async destroy(hand) {
+    await this.localDB.remove(hand);
     this.hands = this.hands.filter( h => h !== hand);
   }
 
-  destroyAll() {
-    this.deleted_hands = this.hands.filter( hand => { 
-      hand._deleted = true;
-      return hand;
+destroyAll() {
+    const deleted_hands = this.hands.map(hand => {
+      return Object.assign({}, hand, { _deleted: true });
     });
-    this.localDB.bulkDocs(this.deleted_hands);
+    this.localDB.bulkDocs(deleted_hands);
     this.hands = [];
   }
 

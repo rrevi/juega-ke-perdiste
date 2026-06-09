@@ -50,11 +50,11 @@ export default class HandModel {
     this.hands = this.hands.filter( h => h !== hand);
   }
 
-  destroyAll() {
+  async destroyAll() {
     const deleted_hands = this.hands.map(hand => {
       return Object.assign({}, hand, { _deleted: true });
     });
-    this.localDB.bulkDocs(deleted_hands);
+    await this.localDB.bulkDocs(deleted_hands);
     this.hands = [];
   }
 

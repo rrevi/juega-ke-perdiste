@@ -1,27 +1,22 @@
 .dominoLogoLockup {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	cursor: pointer;
 	user-select: none;
 	-webkit-user-select: none;
 	padding: 2px 0;
 }
 
-.dominoTilesRow {
-	display: flex;
-	align-items: center;
-	gap: 4px;
-}
-
-.dominoTileSvg {
+.dominoHeaderLogoSvg {
 	display: block;
-	width: 25px;
-	height: 34px;
-	filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+	width: 46px;
+	height: 38px;
+	filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.15));
 	transition: transform 0.15s ease;
 }
 
-.dominoLogoLockup:active .dominoTileSvg {
+.dominoLogoLockup:active .dominoHeaderLogoSvg {
 	transform: translateY(1px) scale(0.95);
 }
 
@@ -29,17 +24,12 @@
 .dominoTileBody {
 	fill: var(--surface);
 	stroke: var(--border);
-	stroke-width: 1.5;
+	stroke-width: 4.5;
 }
 
-.dominoTileDivider {
-	stroke: var(--border);
-	stroke-width: 0.8;
-	opacity: 0.4;
-}
-
-.dominoTileRivet {
-	fill: var(--brass);
+.dominoTileInnerBevel {
+	stroke: var(--surface);
+	stroke-opacity: 0.8;
 }
 
 .dominoTilePip {
@@ -48,20 +38,14 @@
 
 /* Dark Theme Overrides */
 @media (prefers-color-scheme: dark) {
-	.dominoTileSvg {
-		filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
-	}
-	.dominoTileDivider {
-		opacity: 0.3;
+	.dominoHeaderLogoSvg {
+		filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.55));
 	}
 }
 
 @media (max-width: 380px) {
-	.dominoTileSvg {
-		width: 22px;
-		height: 30px;
-	}
-	.dominoTilesRow {
-		gap: 3px;
+	.dominoHeaderLogoSvg {
+		width: 40px;
+		height: 34px;
 	}
 }

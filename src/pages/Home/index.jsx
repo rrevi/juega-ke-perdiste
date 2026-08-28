@@ -3,6 +3,8 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'preact/hooks'
 import HandModel from '../../models/HandModel';
 import Hand from '../../components/Hand';
 import ScoreInputDrawer from '../../components/ScoreInputDrawer';
+import ConfirmModal from '../../components/ConfirmModal';
+import SettingsModal from '../../components/SettingsModal';
 import { requestWakeLock, releaseWakeLock, triggerHaptic } from '../../utils/hardware';
 import './style.css';
 
@@ -41,6 +43,36 @@ export default function Home() {
 	const [confetti, setConfetti] = useState([]);
 	const [drawerState, setDrawerState] = useState({ isOpen: false, team: 'them' });
 
+	const [winScore, setWinScore] = useState(() => {
+		try {
+			const s = localStorage.getItem('jkp-win-score');
+			return s ? parseInt(s, 10) : 200;
+		} catch {
+			return 200;
+		}
+	});
+
+	const [team1, setTeam1] = useState(() => {
+		try {
+			const t = localStorage.getItem('jkp-team1');
+			return t ? JSON.parse(t) : { name: 'Ellos', emoji: '🦅' };
+		} catch {
+			return { name: 'Ellos', emoji: '🦅' };
+		}
+	});
+
+	const [team2, setTeam2] = useState(() => {
+		try {
+			const t = localStorage.getItem('jkp-team2');
+			return t ? JSON.parse(t) : { name: 'Nosotros', emoji: '🐅' };
+		} catch {
+			return { name: 'Nosotros', emoji: '🐅' };
+		}
+	});
+
+	const [isConfirmResetOpen, setIsConfirmResetOpen] = useState(false);
+	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
 	const themInputRef = useRef(null);
 	const winnerModalRef = useRef(null);
 
@@ -61,14 +93,27 @@ export default function Home() {
 		}
 	}, [drawerState.team]);
 
+	const handleSaveSettings = useCallback((newSettings) => {
+		setWinScore(newSettings.winScore);
+		setTeam1(newSettings.team1);
+		setTeam2(newSettings.team2);
+		try {
+			localStorage.setItem('jkp-win-score', String(newSettings.winScore));
+			localStorage.setItem('jkp-team1', JSON.stringify(newSettings.team1));
+			localStorage.setItem('jkp-team2', JSON.stringify(newSettings.team2));
+		} catch {
+			// ignore storage errors
+		}
+	}, []);
+
 	useEffect(() => {
 		requestWakeLock();
 		const unsubscribe = model.subscribe(() => {
 			setHands([...model.hands]);
 			const [themTotal, usTotal] = model.totalScores();
-			if (themTotal >= WIN_SCORE) {
+			if (themTotal >= winScore) {
 				setWinner(w => w !== null ? w : 'them');
-			} else if (usTotal >= WIN_SCORE) {
+			} else if (usTotal >= winScore) {
 				setWinner(w => w !== null ? w : 'us');
 			}
 		});
@@ -78,7 +123,7 @@ export default function Home() {
 			model.dispose();
 			releaseWakeLock();
 		};
-	}, []);
+	}, [winScore]);
 
 	useEffect(() => {
 		if (winner) {
@@ -131,8 +176,18 @@ export default function Home() {
 
 	const newGameButtonClick = useCallback(() => {
 		triggerHaptic('tap');
+		if (hands.length > 0) {
+			setIsConfirmResetOpen(true);
+		} else {
+			model.destroyAll();
+			setWinner(null);
+		}
+	}, [hands.length]);
+
+	const handleConfirmReset = useCallback(() => {
 		model.destroyAll();
 		setWinner(null);
+		setIsConfirmResetOpen(false);
 	}, []);
 
 	const dismissWinner = useCallback(() => {
@@ -188,11 +243,11 @@ export default function Home() {
 						tabIndex={0}
 						onClick={() => openDrawer('them')}
 						onKeyDown={(e) => e.key === 'Enter' && openDrawer('them')}
-						title="Tocar para sumar puntos a Ellos"
+						title={`Tocar para sumar puntos a ${team1.name}`}
 					>
 						<div class="teamHeader">
-							<span class="teamEmoji" role="img" aria-label="Águila">&#x1F985;</span>
-							<span class="teamLabel">Ellos</span>
+							<span class="teamEmoji" role="img" aria-label={team1.name}>{team1.emoji}</span>
+							<span class="teamLabel">{team1.name}</span>
 						</div>
 						<div class="teamScore" id="themTotalScore" title="&#x1F985; Puntaje Total" aria-live="polite">
 							{themTotalScore}
@@ -202,14 +257,39 @@ export default function Home() {
 
 					<div class="scoreboardCenter">
 						<div class="scoreDivider">VS</div>
+						<div class="centerControls">
+							<button
+								type="button"
+								id="newGameButton"
+								class="newGameButton"
+								onClick={newGameButtonClick}
+								title="Nuevo Juego"
+								aria-label="Nuevo Juego">
+									&#8635;
+							</button>
+							<button
+								type="button"
+								id="settingsButton"
+								class="settingsTriggerBtn"
+								onClick={() => {
+									triggerHaptic('tap');
+									setIsSettingsOpen(true);
+								}}
+								title="Ajustes"
+								aria-label="Ajustes">
+									⚙️
+							</button>
+						</div>
 						<button
 							type="button"
-							id="newGameButton"
-							class="newGameButton"
-							onClick={newGameButtonClick}
-							title="Nuevo Juego"
-							aria-label="Nuevo Juego">
-								&#8635;
+							class="targetScorePill"
+							onClick={() => {
+								triggerHaptic('tap');
+								setIsSettingsOpen(true);
+							}}
+							title="Meta para ganar"
+						>
+							Meta: {winScore}
 						</button>
 					</div>
 
@@ -219,11 +299,11 @@ export default function Home() {
 						tabIndex={0}
 						onClick={() => openDrawer('us')}
 						onKeyDown={(e) => e.key === 'Enter' && openDrawer('us')}
-						title="Tocar para sumar puntos a Nosotros"
+						title={`Tocar para sumar puntos a ${team2.name}`}
 					>
 						<div class="teamHeader">
-							<span class="teamEmoji" role="img" aria-label="Tigre">&#x1F405;</span>
-							<span class="teamLabel">Nosotros</span>
+							<span class="teamEmoji" role="img" aria-label={team2.name}>{team2.emoji}</span>
+							<span class="teamLabel">{team2.name}</span>
 						</div>
 						<div class="teamScore" id="usTotalScore" title="&#x1F405; Puntaje Total" aria-live="polite">
 							{usTotalScore}
@@ -240,8 +320,8 @@ export default function Home() {
 						<caption class="sr-only">Tabla de puntaje de dominó</caption>
 						<thead>
 							<tr>
-								<th>&#x1F985; Puntos</th>
-								<th>&#x1F405; Puntos</th>
+								<th>{team1.emoji} {team1.name}</th>
+								<th>{team2.emoji} {team2.name}</th>
 								<th>Acción</th>
 							</tr>
 						</thead>
@@ -251,15 +331,16 @@ export default function Home() {
 									<td colSpan={3}>
 										<div class="emptyState">
 											<span>🀄</span>
-											<p>No hay manos jugadas aún.<br />Toca un equipo abajo para sumar puntos.</p>
+											<p>No hay manos jugadas aún.<br />Toca un equipo para sumar puntos.</p>
 										</div>
 									</td>
 								</tr>
 							) : (
-								hands.map(hand => (
+								hands.map((hand, idx) => (
 									<Hand
 										key={hand._id}
 										hand={hand}
+										index={idx}
 										onRemove={() => removeHand(hand)}
 									/>
 								))
@@ -277,20 +358,20 @@ export default function Home() {
 						class="touchScoreBtn themTouchBtn"
 						onClick={() => openDrawer('them')}
 					>
-						<span class="btnEmoji">&#x1F985;</span> + Puntos Ellos
+						<span class="btnEmoji">{team1.emoji}</span> + {team1.name}
 					</button>
 					<button
 						type="button"
 						class="touchScoreBtn usTouchBtn"
 						onClick={() => openDrawer('us')}
 					>
-						<span class="btnEmoji">&#x1F405;</span> + Puntos Nosotros
+						<span class="btnEmoji">{team2.emoji}</span> + {team2.name}
 					</button>
 				</div>
 
 				<div class="inputContainer manualInputContainer">
 					<div class="inputWrapper">
-						<label htmlFor="themHandScore" class="inputLabel">&#x1F985; Ellos</label>
+						<label htmlFor="themHandScore" class="inputLabel">{team1.emoji} {team1.name}</label>
 						<input
 							id="themHandScore"
 							name="themHandScore"
@@ -308,7 +389,7 @@ export default function Home() {
 					</div>
 
 					<div class="inputWrapper">
-						<label htmlFor="usHandScore" class="inputLabel">&#x1F405; Nosotros</label>
+						<label htmlFor="usHandScore" class="inputLabel">{team2.emoji} {team2.name}</label>
 						<input
 							id="usHandScore"
 							name="usHandScore"
@@ -340,11 +421,33 @@ export default function Home() {
 			<ScoreInputDrawer
 				isOpen={drawerState.isOpen}
 				team={drawerState.team}
-				teamName={drawerState.team === 'them' ? 'Ellos' : 'Nosotros'}
-				teamEmoji={drawerState.team === 'them' ? '🦅' : '🐅'}
+				teamName={drawerState.team === 'them' ? team1.name : team2.name}
+				teamEmoji={drawerState.team === 'them' ? team1.emoji : team2.emoji}
 				maxScore={MAX_HAND_SCORE}
 				onClose={closeDrawer}
 				onSubmit={handleDrawerScore}
+			/>
+
+			{/* Confirm New Game Reset Modal */}
+			<ConfirmModal
+				isOpen={isConfirmResetOpen}
+				title="¿Reiniciar partida?"
+				message="Se borrarán todos los puntos y manos registradas."
+				confirmText="Reiniciar"
+				cancelText="Cancelar"
+				isDanger={true}
+				onConfirm={handleConfirmReset}
+				onCancel={() => setIsConfirmResetOpen(false)}
+			/>
+
+			{/* Settings Modal */}
+			<SettingsModal
+				isOpen={isSettingsOpen}
+				currentWinScore={winScore}
+				team1={team1}
+				team2={team2}
+				onClose={() => setIsSettingsOpen(false)}
+				onSave={handleSaveSettings}
 			/>
 
 			{winner && (
@@ -374,14 +477,14 @@ export default function Home() {
 						))}
 					</div>
 					<div class="winnerEmoji">
-						{winner === 'them' ? '\u{1F985}' : '\u{1F405}'}
+						{winner === 'them' ? team1.emoji : team2.emoji}
 					</div>
-					<h2 class="winnerText">¡Ganador!</h2>
+					<h2 class="winnerText">¡{winner === 'them' ? team1.name : team2.name} Gana!</h2>
 					<div class="winnerActions">
 						<button onClick={dismissWinner}>Continuar</button>
 						<button onClick={() => {
 							dismissWinner();
-							newGameButtonClick();
+							model.destroyAll();
 						}}>Nuevo Juego</button>
 					</div>
 				</div>

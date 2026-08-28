@@ -5,8 +5,12 @@ import { render, fireEvent, screen, waitFor } from '@testing-library/preact';
 import Home from '../src/pages/Home';
 
 describe('Home', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   afterEach(() => {
-    fireEvent.click(screen.getByText("↻"));
+    localStorage.clear();
   });
 
   test('should display initial score', () => {
@@ -52,7 +56,7 @@ describe('Home', () => {
     });
   });
 
-  test('should clear all hands after "↻" button is clicked', async () => {
+  test('should clear all hands after "↻" button is clicked and confirmed', async () => {
     render(<Home />);
 
     const themHandScore = await screen.getByTitle("🦅 Puntos de la Mano");
@@ -74,6 +78,9 @@ describe('Home', () => {
     });
 
     fireEvent.click(screen.getByText("↻"));
+    // Confirm dialog
+    fireEvent.click(screen.getByText("Reiniciar"));
+
     await waitFor(() => {
         expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('0');
         expect(screen.getByTitle("🐅 Puntaje Total").innerHTML).toMatch('0');

@@ -300,11 +300,15 @@
 
 .winnerShareBtn {
 	background-color: var(--accent) !important;
-	color: #fff !important;
+	color: var(--accent-contrast) !important;
 }
 
 .winnerActions button:hover {
-	background-color: var(--accent-hover);
+	background-color: var(--surface-hover);
+}
+
+.winnerShareBtn:hover {
+	background-color: var(--accent-hover) !important;
 }
 
 .winnerConfetti {

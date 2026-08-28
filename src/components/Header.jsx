@@ -1,13 +1,12 @@
-import dominoLogo from '../assets/domino.svg';
+import { h } from 'preact';
+import DominoLogo from './DominoLogo';
 
-export function Header() {
+export function Header({ rightAction }) {
 	return (
-		<header>
-			<div class="headerLogo">
-				<img src={dominoLogo} alt="Juega ke perdiste! logo" width="90" />
-			</div>
-			<div class="headerTitle">
-				<h4>Juega ke perdiste!</h4>
+		<header class="appHeader">
+			<div class="headerContent">
+				<DominoLogo />
+				{rightAction && <div class="headerActions">{rightAction}</div>}
 			</div>
 		</header>
 	);

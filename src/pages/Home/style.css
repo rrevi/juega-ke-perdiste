@@ -336,6 +336,11 @@
 	text-align: center;
 }
 
+.actionColHeader {
+	width: 46px;
+	max-width: 50px;
+}
+
 .roundNumberCell {
 	color: var(--text-secondary);
 	font-size: 0.82rem;

@@ -351,10 +351,10 @@ export default function Home() {
 						<caption class="sr-only">Tabla de puntaje de dominó</caption>
 						<thead>
 							<tr>
-								<th class="roundColHeader">#</th>
+								<th class="roundColHeader" aria-label="Número de mano"></th>
 								<th>{team1.emoji} {team1.name}</th>
 								<th>{team2.emoji} {team2.name}</th>
-								<th>Acción</th>
+								<th class="actionColHeader" aria-label="Acción"></th>
 							</tr>
 						</thead>
 						<tbody>

@@ -35,10 +35,6 @@ export default function Home() {
 	const model = modelRef.current;
 
 	const [hands, setHands] = useState(model.hands);
-	const [themInput, setThemInput] = useState('');
-	const [usInput, setUsInput] = useState('');
-	const [themError, setThemError] = useState(false);
-	const [usError, setUsError] = useState(false);
 	const [winner, setWinner] = useState(null);
 	const [confetti, setConfetti] = useState([]);
 	const [drawerState, setDrawerState] = useState({ isOpen: false, team: 'them' });
@@ -73,7 +69,6 @@ export default function Home() {
 	const [isConfirmResetOpen, setIsConfirmResetOpen] = useState(false);
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-	const themInputRef = useRef(null);
 	const winnerModalRef = useRef(null);
 
 	const openDrawer = useCallback((team) => {
@@ -191,32 +186,6 @@ export default function Home() {
 		model.destroy(hand);
 	}, []);
 
-	const addHandButtonClick = useCallback(() => {
-		const them = parseInt(themInput, 10) || 0;
-		const us = parseInt(usInput, 10) || 0;
-
-		const themErr = them > 0 && them > MAX_HAND_SCORE;
-		const usErr = us > 0 && us > MAX_HAND_SCORE;
-
-		setThemError(themErr);
-		setUsError(usErr);
-
-		if (themErr || usErr) {
-			triggerHaptic('error');
-			return;
-		}
-
-		if (them > 0 || us > 0) {
-			triggerHaptic('success');
-			model.add(them, us);
-			setThemInput('');
-			setUsInput('');
-			requestAnimationFrame(() => {
-				themInputRef.current?.focus();
-			});
-		}
-	}, [themInput, usInput]);
-
 	const newGameButtonClick = useCallback(() => {
 		triggerHaptic('tap');
 		if (hands.length > 0) {
@@ -235,9 +204,6 @@ export default function Home() {
 
 	const dismissWinner = useCallback(() => {
 		setWinner(null);
-		requestAnimationFrame(() => {
-			themInputRef.current?.focus();
-		});
 	}, []);
 
 	const handleWinnerKeyDown = useCallback((e) => {
@@ -264,16 +230,6 @@ export default function Home() {
 			}
 		}
 	}, [dismissWinner]);
-
-	const themInputChange = useCallback((e) => {
-		setThemInput(e.target.value);
-		setThemError(false);
-	}, []);
-
-	const usInputChange = useCallback((e) => {
-		setUsInput(e.target.value);
-		setUsError(false);
-	}, []);
 
 	return (
 		<div class="home">
@@ -405,6 +361,7 @@ export default function Home() {
 				<div class="primaryTouchActions">
 					<button
 						type="button"
+						id="themAddScoreBtn"
 						class="touchScoreBtn themTouchBtn"
 						onClick={() => openDrawer('them')}
 					>
@@ -412,57 +369,11 @@ export default function Home() {
 					</button>
 					<button
 						type="button"
+						id="usAddScoreBtn"
 						class="touchScoreBtn usTouchBtn"
 						onClick={() => openDrawer('us')}
 					>
 						<span class="btnEmoji">{team2.emoji}</span> + {team2.name}
-					</button>
-				</div>
-
-				<div class="inputContainer manualInputContainer">
-					<div class="inputWrapper">
-						<label htmlFor="themHandScore" class="inputLabel">{team1.emoji} {team1.name}</label>
-						<input
-							id="themHandScore"
-							name="themHandScore"
-							ref={themInputRef}
-							value={themInput}
-							onChange={themInputChange}
-							placeholder="0"
-							type="number"
-							inputMode="numeric"
-							pattern="[0-9]*"
-							min="0"
-							max="168"
-							class={themError ? 'invalid' : ''}
-							title="&#x1F985; Puntos de la Mano" />
-					</div>
-
-					<div class="inputWrapper">
-						<label htmlFor="usHandScore" class="inputLabel">{team2.emoji} {team2.name}</label>
-						<input
-							id="usHandScore"
-							name="usHandScore"
-							value={usInput}
-							onChange={usInputChange}
-							placeholder="0"
-							type="number"
-							inputMode="numeric"
-							pattern="[0-9]*"
-							min="0"
-							max="168"
-							class={usError ? 'invalid' : ''}
-							title="&#x1F405; Puntos de la Mano" />
-					</div>
-
-					<button
-						type="button"
-						id="addHandButton"
-						class="addHandButton"
-						onClick={addHandButtonClick}
-						title="Agregar Mano"
-						aria-label="Agregar Mano">
-							+
 					</button>
 				</div>
 			</div>

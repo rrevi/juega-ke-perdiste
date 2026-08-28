@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { useState, useEffect, useMemo, useRef, useCallback } from 'preact/hooks';
 import HandModel from '../../models/HandModel';
 import Hand from '../../components/Hand';
+import { requestWakeLock, releaseWakeLock, triggerHaptic } from '../../utils/hardware';
 import './style.css';
 
 const WIN_SCORE = 200;
@@ -42,6 +43,7 @@ export default function Home() {
 	const winnerModalRef = useRef(null);
 
 	useEffect(() => {
+		requestWakeLock();
 		const unsubscribe = model.subscribe(() => {
 			setHands([...model.hands]);
 			const [themTotal, usTotal] = model.totalScores();
@@ -55,11 +57,13 @@ export default function Home() {
 		return () => {
 			unsubscribe();
 			model.dispose();
+			releaseWakeLock();
 		};
 	}, []);
 
 	useEffect(() => {
 		if (winner) {
+			triggerHaptic('win');
 			setConfetti(generateConfetti());
 			winnerModalRef.current?.focus();
 		}
@@ -76,6 +80,7 @@ export default function Home() {
 	}, [hands]);
 
 	const removeHand = useCallback((hand) => {
+		triggerHaptic('remove');
 		model.destroy(hand);
 	}, []);
 
@@ -89,9 +94,13 @@ export default function Home() {
 		setThemError(themErr);
 		setUsError(usErr);
 
-		if (themErr || usErr) return;
+		if (themErr || usErr) {
+			triggerHaptic('error');
+			return;
+		}
 
 		if (them > 0 || us > 0) {
+			triggerHaptic('success');
 			model.add(them, us);
 			setThemInput('');
 			setUsInput('');
@@ -102,6 +111,7 @@ export default function Home() {
 	}, [themInput, usInput]);
 
 	const newGameButtonClick = useCallback(() => {
+		triggerHaptic('tap');
 		model.destroyAll();
 		setWinner(null);
 	}, []);

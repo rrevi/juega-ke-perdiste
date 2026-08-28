@@ -63,12 +63,12 @@
 
 .modalConfirmBtn {
 	background-color: var(--accent);
-	color: #fff;
+	color: var(--accent-contrast);
 }
 
 .modalConfirmBtn.isDanger {
 	background-color: var(--error);
-	color: #fff;
+	color: #ffffff;
 	border-color: var(--error);
 }
 

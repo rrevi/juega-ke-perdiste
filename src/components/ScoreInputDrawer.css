@@ -133,7 +133,7 @@
 
 .presetChip:active {
 	background-color: var(--accent);
-	color: #fff;
+	color: var(--accent-contrast);
 	transform: scale(0.95);
 }
 
@@ -175,7 +175,7 @@
 	height: 50px;
 	border-radius: 12px;
 	background-color: var(--accent);
-	color: #ffffff;
+	color: var(--accent-contrast);
 	font-size: 1.15rem;
 	font-weight: 700;
 	border: 2px solid var(--border);

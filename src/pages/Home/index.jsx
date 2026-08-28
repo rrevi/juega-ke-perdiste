@@ -11,7 +11,7 @@ import './style.css';
 const WIN_SCORE = 200;
 const MAX_HAND_SCORE = 168;
 const CONFETTI_COUNT = 20;
-const CONFETTI_COLORS = ['#c75b39', '#fdeccd', '#e5cfae', '#d4694a', '#ff9a3c', '#36d6b5'];
+const CONFETTI_COLORS = ['#18181b', '#ffffff', '#b8860b', '#dc2626', '#e5a93c', '#5a5a64'];
 
 function generateConfetti() {
 	const pieces = [];

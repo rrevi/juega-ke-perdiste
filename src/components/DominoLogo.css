@@ -1,21 +1,23 @@
 .dominoLogoLockup {
 	display: flex;
 	align-items: center;
-	gap: 10px;
 	cursor: pointer;
 	user-select: none;
 	-webkit-user-select: none;
+	padding: 2px 0;
 }
 
 .dominoTilesRow {
 	display: flex;
 	align-items: center;
-	gap: 3px;
+	gap: 4px;
 }
 
 .dominoTileSvg {
 	display: block;
-	filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.12));
+	width: 25px;
+	height: 34px;
+	filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
 	transition: transform 0.15s ease;
 }
 
@@ -44,25 +46,10 @@
 	fill: var(--text);
 }
 
-/* Typography */
-.dominoLogoText {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-}
-
-.dominoBrandTitle {
-	font-size: 1.05rem;
-	font-weight: 800;
-	letter-spacing: -0.3px;
-	color: var(--text);
-	line-height: 1.1;
-}
-
 /* Dark Theme Overrides */
 @media (prefers-color-scheme: dark) {
 	.dominoTileSvg {
-		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+		filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
 	}
 	.dominoTileDivider {
 		opacity: 0.3;
@@ -70,11 +57,11 @@
 }
 
 @media (max-width: 380px) {
-	.dominoBrandTitle {
-		font-size: 0.95rem;
-	}
 	.dominoTileSvg {
-		width: 20px;
-		height: 28px;
+		width: 22px;
+		height: 30px;
+	}
+	.dominoTilesRow {
+		gap: 3px;
 	}
 }

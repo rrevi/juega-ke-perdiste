@@ -92,15 +92,18 @@ export default function DominoLogo() {
 	};
 
 	return (
-		<div class="dominoLogoLockup" onClick={handleLogoClick} role="banner">
-			<div class="dominoTilesRow" title="J-K-P-!">
+		<div
+			class="dominoLogoLockup"
+			onClick={handleLogoClick}
+			role="banner"
+			title="Juega ke perdiste!"
+			aria-label="Juega ke perdiste!"
+		>
+			<div class="dominoTilesRow">
 				<DominoTileGlyph char="J" />
 				<DominoTileGlyph char="K" />
 				<DominoTileGlyph char="P" />
 				<DominoTileGlyph char="!" />
-			</div>
-			<div class="dominoLogoText">
-				<span class="dominoBrandTitle">Juega ke perdiste!</span>
 			</div>
 		</div>
 	);

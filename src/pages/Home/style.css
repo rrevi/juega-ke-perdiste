@@ -1,59 +1,159 @@
 .home {
 	color: var(--text);
 	width: 100%;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	max-width: 520px;
+	margin: 0 auto;
+	padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 
-.home section {
+/* Sticky Top Scoreboard */
+.stickyScoreboard {
+	position: sticky;
+	top: 49px;
+	z-index: 90;
+	background-color: var(--bg);
+	padding: 10px 12px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.scoreboardContainer {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	align-items: center;
+	gap: 8px;
+}
+
+.teamCard {
+	background-color: var(--surface);
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	border-radius: 12px;
+	padding: 8px 10px;
+	text-align: center;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+	transition: transform 0.15s ease;
+}
+
+.teamHeader {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	margin-bottom: 2px;
+}
+
+.teamEmoji {
+	font-size: 1.4rem;
+	line-height: 1;
+}
+
+.teamLabel {
+	font-size: 0.85rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	opacity: 0.85;
+}
+
+.teamScore {
+	font-size: 2.4rem;
+	font-weight: 800;
+	line-height: 1.1;
+	letter-spacing: -1px;
+	color: var(--text);
+}
+
+.scoreboardCenter {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+}
+
+.scoreDivider {
+	font-size: 0.75rem;
+	font-weight: 700;
+	opacity: 0.5;
+	letter-spacing: 1px;
+}
+
+.newGameButton {
+	width: 38px;
+	height: 38px;
+	min-width: 38px;
+	min-height: 38px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.2rem;
+	padding: 0;
+	border: 1px solid var(--border);
+	background-color: var(--surface);
+}
+
+/* Hands Section */
+.handsSection {
+	flex: 1;
+	overflow-y: auto;
+	padding: 12px 12px 90px;
 	margin: 0;
 	border-bottom: 0;
 }
 
-.gameHands {
-	border-collapse: collapse;
-	box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-	margin-left: auto;
-	margin-right: auto;
+.handsContainer {
 	width: 100%;
-	max-width: 480px;
 }
 
-.gameHands td {
-	padding: 10px;
-	border: 0;
-	background-color: var(--bg);
-	text-align: center;
-}
-
-.gameHands td .inputWrapper {
-	display: flex;
-	flex-direction: column;
-	gap: 0.3rem;
-}
-
-.gameHands thead tr {
-	border-bottom: 2px solid var(--surface);
+.gameHands {
+	border-collapse: separate;
+	border-spacing: 0;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+	width: 100%;
+	border-radius: 10px;
+	overflow: hidden;
+	background-color: var(--surface);
 }
 
 .gameHands thead tr th {
-	padding: 10px;
-	border: 0;
-	background-color: var(--bg);
+	padding: 8px 12px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+	background-color: var(--surface);
+	font-size: 0.85rem;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	opacity: 0.8;
 	text-align: center;
 }
 
-.teamEmoji {
-	font-size: 30px;
+.gameHands tbody tr:not(:last-child) td {
+	border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.gameHands tfoot tr {
-	border-top: 2px solid var(--surface);
+.emptyHandsRow td {
+	padding: 2.5rem 1rem !important;
 }
 
-.gameHands tfoot tr th {
-	padding: 10px;
-	border: 0;
-	background-color: var(--bg);
+.emptyState {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	color: var(--text-secondary);
+}
+
+.emptyState span {
+	font-size: 2.5rem;
+}
+
+.emptyState p {
+	margin: 0;
+	font-size: 0.9rem;
 	text-align: center;
+	line-height: 1.4;
 }
 
 .winnerBanner {
@@ -117,36 +217,84 @@
 .handRow td {
 	padding: 10px;
 	border: 0;
-	background-color: var(--bg);
+	background-color: var(--surface);
 	text-align: center;
+	font-size: 1.1rem;
+	font-weight: 600;
 }
 
 .handRow .removeHandButton {
-	min-width: 44px;
-	min-height: 44px;
-	padding: 0.4rem;
+	width: 36px;
+	height: 36px;
+	min-width: 36px;
+	min-height: 36px;
+	padding: 0;
+	border-radius: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	font-size: 1.2rem;
+	line-height: 1;
+	border: 1px solid var(--border);
+	background-color: var(--bg);
 }
 
-.newGameButton {
-	min-width: 44px;
-	min-height: 44px;
+.inputSection {
+	position: sticky;
+	bottom: 0;
+	background-color: var(--bg);
+	border-top: 1px solid rgba(0, 0, 0, 0.08);
+	padding: 10px 12px max(12px, env(safe-area-inset-bottom));
+	box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+	z-index: 80;
+}
+
+.inputContainer {
+	display: grid;
+	grid-template-columns: 1fr 1fr auto;
+	gap: 10px;
+	align-items: flex-end;
+}
+
+.inputWrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.inputLabel {
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	opacity: 0.75;
+}
+
+.inputContainer input {
+	width: 100%;
+	height: 44px;
 	font-size: 1.2rem;
+	font-weight: 700;
+	border-radius: 8px;
+	text-indent: 0;
 }
 
 .addHandButton {
-	min-width: 44px;
+	min-width: 48px;
+	height: 44px;
 	min-height: 44px;
-	font-size: 1.2rem;
+	font-size: 1.5rem;
 	font-weight: bold;
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: var(--accent);
+	color: #fff;
+	border: 1px solid var(--border);
 }
 
 @media (max-width: 639px) {
-	.home section {
-		grid-template-columns: 1fr;
-		row-gap: 1rem;
-	}
-
 	.winnerEmoji {
 		font-size: 60px;
 	}
@@ -157,7 +305,22 @@
 }
 
 @media (prefers-color-scheme: dark) {
+	.stickyScoreboard {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+	}
+	.teamCard {
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
 	.gameHands {
-		box-shadow: 0 0 20px #998877;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+	}
+	.inputSection {
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.25);
+	}
+	.addHandButton {
+		background-color: var(--accent);
+		color: #fff;
 	}
 }

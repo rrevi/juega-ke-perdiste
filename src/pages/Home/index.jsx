@@ -160,91 +160,129 @@ export default function Home() {
 
 	return (
 		<div class="home">
-			<section>
-				<table class="gameHands">
-					<caption class="sr-only">Tabla de puntaje de dominó</caption>
-					<thead>
-						<tr>
-							<th class="teamEmoji">&#x1F985;<span class="sr-only">Águila</span></th>
-							<th class="teamEmoji">&#x1F405;<span class="sr-only">Tigre</span></th>
-							<th>
-								<button
-									type="button"
-									id="newGameButton"
-									class="newGameButton"
-									onClick={newGameButtonClick}
-									title="Nuevo Juego"
-									aria-label="Nuevo Juego">
-										&#8635;
-								</button>
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{hands.map(hand => (
-							<Hand
-								key={hand._id}
-								hand={hand}
-								onRemove={() => removeHand(hand)}
-							/>
-						))}
-						<tr>
-							<td>
-								<div class="inputWrapper">
-									<input
-										id="themHandScore"
-										name="themHandScore"
-										value={themInput}
-										onChange={themInputChange}
-										placeholder="0"
-										type="number"
-										inputMode="numeric"
-										pattern="[0-9]*"
-										min="0"
-										max="168"
-										class={themError ? 'invalid' : ''}
-										title="&#x1F985; Puntos de la Mano" />
-								</div>
-							</td>
-							<td>
-								<div class="inputWrapper">
-									<input
-										id="usHandScore"
-										name="usHandScore"
-										value={usInput}
-										onChange={usInputChange}
-										placeholder="0"
-										type="number"
-										inputMode="numeric"
-										pattern="[0-9]*"
-										min="0"
-										max="168"
-										class={usError ? 'invalid' : ''}
-										title="&#x1F405; Puntos de la Mano" />
-								</div>
-							</td>
-							<td>
-								<button
-									type="button"
-									id="addHandButton"
-									class="addHandButton"
-									onClick={addHandButtonClick}
-									title="Agregar Mano"
-									aria-label="Agregar Mano">
-										+
-								</button>
-							</td>
-						</tr>
-					</tbody>
-					<tfoot>
-					<tr>
-						<th id="themTotalScore" title="&#x1F985; Puntaje Total" aria-live="polite">{themTotalScore}</th>
-						<th id="usTotalScore" title="&#x1F405; Puntaje Total" aria-live="polite">{usTotalScore}</th>
-						<th />
-					</tr>
-					</tfoot>
-				</table>
+			{/* Sticky Top Scoreboard */}
+			<div class="stickyScoreboard">
+				<div class="scoreboardContainer">
+					<div class="teamCard themTeamCard">
+						<div class="teamHeader">
+							<span class="teamEmoji" role="img" aria-label="Águila">&#x1F985;</span>
+							<span class="teamLabel">Ellos</span>
+						</div>
+						<div class="teamScore" id="themTotalScore" title="&#x1F985; Puntaje Total" aria-live="polite">
+							{themTotalScore}
+						</div>
+					</div>
+
+					<div class="scoreboardCenter">
+						<div class="scoreDivider">VS</div>
+						<button
+							type="button"
+							id="newGameButton"
+							class="newGameButton"
+							onClick={newGameButtonClick}
+							title="Nuevo Juego"
+							aria-label="Nuevo Juego">
+								&#8635;
+						</button>
+					</div>
+
+					<div class="teamCard usTeamCard">
+						<div class="teamHeader">
+							<span class="teamEmoji" role="img" aria-label="Tigre">&#x1F405;</span>
+							<span class="teamLabel">Nosotros</span>
+						</div>
+						<div class="teamScore" id="usTotalScore" title="&#x1F405; Puntaje Total" aria-live="polite">
+							{usTotalScore}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* Scrollable Hands History */}
+			<section class="handsSection">
+				<div class="handsContainer">
+					<table class="gameHands">
+						<caption class="sr-only">Tabla de puntaje de dominó</caption>
+						<thead>
+							<tr>
+								<th>&#x1F985; Puntos</th>
+								<th>&#x1F405; Puntos</th>
+								<th>Acción</th>
+							</tr>
+						</thead>
+						<tbody>
+							{hands.length === 0 ? (
+								<tr class="emptyHandsRow">
+									<td colSpan={3}>
+										<div class="emptyState">
+											<span>🀄</span>
+											<p>No hay manos jugadas aún.<br />Ingresa los puntos abajo.</p>
+										</div>
+									</td>
+								</tr>
+							) : (
+								hands.map(hand => (
+									<Hand
+										key={hand._id}
+										hand={hand}
+										onRemove={() => removeHand(hand)}
+									/>
+								))
+							)}
+						</tbody>
+					</table>
+				</div>
 			</section>
+
+			{/* Input Bar */}
+			<div class="inputSection">
+				<div class="inputContainer">
+					<div class="inputWrapper">
+						<label htmlFor="themHandScore" class="inputLabel">&#x1F985; Ellos</label>
+						<input
+							id="themHandScore"
+							name="themHandScore"
+							ref={themInputRef}
+							value={themInput}
+							onChange={themInputChange}
+							placeholder="0"
+							type="number"
+							inputMode="numeric"
+							pattern="[0-9]*"
+							min="0"
+							max="168"
+							class={themError ? 'invalid' : ''}
+							title="&#x1F985; Puntos de la Mano" />
+					</div>
+
+					<div class="inputWrapper">
+						<label htmlFor="usHandScore" class="inputLabel">&#x1F405; Nosotros</label>
+						<input
+							id="usHandScore"
+							name="usHandScore"
+							value={usInput}
+							onChange={usInputChange}
+							placeholder="0"
+							type="number"
+							inputMode="numeric"
+							pattern="[0-9]*"
+							min="0"
+							max="168"
+							class={usError ? 'invalid' : ''}
+							title="&#x1F405; Puntos de la Mano" />
+					</div>
+
+					<button
+						type="button"
+						id="addHandButton"
+						class="addHandButton"
+						onClick={addHandButtonClick}
+						title="Agregar Mano"
+						aria-label="Agregar Mano">
+							+
+					</button>
+				</div>
+			</div>
 
 			{winner && (
 				<div

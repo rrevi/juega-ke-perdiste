@@ -143,6 +143,49 @@ export default function Home() {
 		return [themTotal, usTotal];
 	}, [hands]);
 
+	const themPercent = useMemo(() => {
+		return Math.min(100, Math.round((themTotalScore / winScore) * 100));
+	}, [themTotalScore, winScore]);
+
+	const usPercent = useMemo(() => {
+		return Math.min(100, Math.round((usTotalScore / winScore) * 100));
+	}, [usTotalScore, winScore]);
+
+	const matchStats = useMemo(() => {
+		const totalRounds = hands.length;
+		const maxHand = totalRounds > 0 ? Math.max(...hands.map(h => Math.max(h.themScore, h.usScore))) : 0;
+		const avgScore = totalRounds > 0 ? Math.round((themTotalScore + usTotalScore) / totalRounds) : 0;
+		return { totalRounds, maxHand, avgScore };
+	}, [hands, themTotalScore, usTotalScore]);
+
+	const [copiedToast, setCopiedToast] = useState(false);
+
+	const shareScorecard = useCallback(() => {
+		triggerHaptic('tap');
+		const winnerTeam = winner === 'them' ? team1 : team2;
+		const winnerScore = winner === 'them' ? themTotalScore : usTotalScore;
+		const loserTeam = winner === 'them' ? team2 : team1;
+		const loserScore = winner === 'them' ? usTotalScore : themTotalScore;
+
+		const shareText = `🏆 ¡${winnerTeam.emoji} ${winnerTeam.name} ganó la partida de Dominó! (${winnerScore} a ${loserScore} pts)\n\n` +
+			`📊 Manos jugadas: ${matchStats.totalRounds}\n` +
+			`🔥 Mano más alta: ${matchStats.maxHand} pts\n` +
+			`🎯 Meta: ${winScore} pts\n\n` +
+			`Juega ke perdiste! 🀄`;
+
+		if (typeof navigator !== 'undefined' && navigator.share) {
+			navigator.share({
+				title: 'Resultado de Dominó - Juega ke perdiste!',
+				text: shareText
+			}).catch(() => {});
+		} else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+			navigator.clipboard.writeText(shareText).then(() => {
+				setCopiedToast(true);
+				setTimeout(() => setCopiedToast(false), 2500);
+			});
+		}
+	}, [winner, team1, team2, themTotalScore, usTotalScore, matchStats, winScore]);
+
 	const removeHand = useCallback((hand) => {
 		triggerHaptic('remove');
 		model.destroy(hand);
@@ -238,7 +281,7 @@ export default function Home() {
 			<div class="stickyScoreboard">
 				<div class="scoreboardContainer">
 					<div
-						class="teamCard themTeamCard clickableTeamCard"
+						class={`teamCard themTeamCard clickableTeamCard ${themTotalScore > usTotalScore && themTotalScore > 0 ? 'isLeading' : ''}`}
 						role="button"
 						tabIndex={0}
 						onClick={() => openDrawer('them')}
@@ -252,7 +295,10 @@ export default function Home() {
 						<div class="teamScore" id="themTotalScore" title="&#x1F985; Puntaje Total" aria-live="polite">
 							{themTotalScore}
 						</div>
-						<span class="tapToScoreHint">+ Tocar para sumar</span>
+						<div class="teamProgressBar">
+							<div class="teamProgressFill" style={{ width: `${themPercent}%` }} />
+						</div>
+						<span class="teamProgressLabel">{themPercent}%</span>
 					</div>
 
 					<div class="scoreboardCenter">
@@ -294,7 +340,7 @@ export default function Home() {
 					</div>
 
 					<div
-						class="teamCard usTeamCard clickableTeamCard"
+						class={`teamCard usTeamCard clickableTeamCard ${usTotalScore > themTotalScore && usTotalScore > 0 ? 'isLeading' : ''}`}
 						role="button"
 						tabIndex={0}
 						onClick={() => openDrawer('us')}
@@ -308,7 +354,10 @@ export default function Home() {
 						<div class="teamScore" id="usTotalScore" title="&#x1F405; Puntaje Total" aria-live="polite">
 							{usTotalScore}
 						</div>
-						<span class="tapToScoreHint">+ Tocar para sumar</span>
+						<div class="teamProgressBar">
+							<div class="teamProgressFill" style={{ width: `${usPercent}%` }} />
+						</div>
+						<span class="teamProgressLabel">{usPercent}%</span>
 					</div>
 				</div>
 			</div>
@@ -480,9 +529,29 @@ export default function Home() {
 						{winner === 'them' ? team1.emoji : team2.emoji}
 					</div>
 					<h2 class="winnerText">¡{winner === 'them' ? team1.name : team2.name} Gana!</h2>
+
+					{/* Match Stats Summary */}
+					<div class="matchStatsCard">
+						<div class="statItem">
+							<span class="statLabel">Marcador Final</span>
+							<span class="statValue">{themTotalScore} - {usTotalScore}</span>
+						</div>
+						<div class="statItem">
+							<span class="statLabel">Manos Jugadas</span>
+							<span class="statValue">{matchStats.totalRounds}</span>
+						</div>
+						<div class="statItem">
+							<span class="statLabel">Mano Más Alta</span>
+							<span class="statValue">+{matchStats.maxHand} pts</span>
+						</div>
+					</div>
+
 					<div class="winnerActions">
-						<button onClick={dismissWinner}>Continuar</button>
-						<button onClick={() => {
+						<button type="button" class="winnerShareBtn" onClick={shareScorecard}>
+							{copiedToast ? '✓ ¡Copiado!' : '📤 Compartir Resultado'}
+						</button>
+						<button type="button" onClick={dismissWinner}>Continuar</button>
+						<button type="button" class="winnerNewGameBtn" onClick={() => {
 							dismissWinner();
 							model.destroyAll();
 						}}>Nuevo Juego</button>

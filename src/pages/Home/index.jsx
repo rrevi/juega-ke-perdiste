@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { useState, useEffect, useMemo, useRef, useCallback } from 'preact/hooks';
 import HandModel from '../../models/HandModel';
 import Hand from '../../components/Hand';
+import ScoreInputDrawer from '../../components/ScoreInputDrawer';
 import { requestWakeLock, releaseWakeLock, triggerHaptic } from '../../utils/hardware';
 import './style.css';
 
@@ -38,9 +39,27 @@ export default function Home() {
 	const [usError, setUsError] = useState(false);
 	const [winner, setWinner] = useState(null);
 	const [confetti, setConfetti] = useState([]);
+	const [drawerState, setDrawerState] = useState({ isOpen: false, team: 'them' });
 
 	const themInputRef = useRef(null);
 	const winnerModalRef = useRef(null);
+
+	const openDrawer = useCallback((team) => {
+		triggerHaptic('tap');
+		setDrawerState({ isOpen: true, team });
+	}, []);
+
+	const closeDrawer = useCallback(() => {
+		setDrawerState(prev => ({ ...prev, isOpen: false }));
+	}, []);
+
+	const handleDrawerScore = useCallback((score) => {
+		if (drawerState.team === 'them') {
+			model.add(score, 0);
+		} else {
+			model.add(0, score);
+		}
+	}, [drawerState.team]);
 
 	useEffect(() => {
 		requestWakeLock();
@@ -163,7 +182,14 @@ export default function Home() {
 			{/* Sticky Top Scoreboard */}
 			<div class="stickyScoreboard">
 				<div class="scoreboardContainer">
-					<div class="teamCard themTeamCard">
+					<div
+						class="teamCard themTeamCard clickableTeamCard"
+						role="button"
+						tabIndex={0}
+						onClick={() => openDrawer('them')}
+						onKeyDown={(e) => e.key === 'Enter' && openDrawer('them')}
+						title="Tocar para sumar puntos a Ellos"
+					>
 						<div class="teamHeader">
 							<span class="teamEmoji" role="img" aria-label="Águila">&#x1F985;</span>
 							<span class="teamLabel">Ellos</span>
@@ -171,6 +197,7 @@ export default function Home() {
 						<div class="teamScore" id="themTotalScore" title="&#x1F985; Puntaje Total" aria-live="polite">
 							{themTotalScore}
 						</div>
+						<span class="tapToScoreHint">+ Tocar para sumar</span>
 					</div>
 
 					<div class="scoreboardCenter">
@@ -186,7 +213,14 @@ export default function Home() {
 						</button>
 					</div>
 
-					<div class="teamCard usTeamCard">
+					<div
+						class="teamCard usTeamCard clickableTeamCard"
+						role="button"
+						tabIndex={0}
+						onClick={() => openDrawer('us')}
+						onKeyDown={(e) => e.key === 'Enter' && openDrawer('us')}
+						title="Tocar para sumar puntos a Nosotros"
+					>
 						<div class="teamHeader">
 							<span class="teamEmoji" role="img" aria-label="Tigre">&#x1F405;</span>
 							<span class="teamLabel">Nosotros</span>
@@ -194,6 +228,7 @@ export default function Home() {
 						<div class="teamScore" id="usTotalScore" title="&#x1F405; Puntaje Total" aria-live="polite">
 							{usTotalScore}
 						</div>
+						<span class="tapToScoreHint">+ Tocar para sumar</span>
 					</div>
 				</div>
 			</div>
@@ -216,7 +251,7 @@ export default function Home() {
 									<td colSpan={3}>
 										<div class="emptyState">
 											<span>🀄</span>
-											<p>No hay manos jugadas aún.<br />Ingresa los puntos abajo.</p>
+											<p>No hay manos jugadas aún.<br />Toca un equipo abajo para sumar puntos.</p>
 										</div>
 									</td>
 								</tr>
@@ -234,9 +269,26 @@ export default function Home() {
 				</div>
 			</section>
 
-			{/* Input Bar */}
+			{/* Bottom Action Area */}
 			<div class="inputSection">
-				<div class="inputContainer">
+				<div class="primaryTouchActions">
+					<button
+						type="button"
+						class="touchScoreBtn themTouchBtn"
+						onClick={() => openDrawer('them')}
+					>
+						<span class="btnEmoji">&#x1F985;</span> + Puntos Ellos
+					</button>
+					<button
+						type="button"
+						class="touchScoreBtn usTouchBtn"
+						onClick={() => openDrawer('us')}
+					>
+						<span class="btnEmoji">&#x1F405;</span> + Puntos Nosotros
+					</button>
+				</div>
+
+				<div class="inputContainer manualInputContainer">
 					<div class="inputWrapper">
 						<label htmlFor="themHandScore" class="inputLabel">&#x1F985; Ellos</label>
 						<input
@@ -283,6 +335,17 @@ export default function Home() {
 					</button>
 				</div>
 			</div>
+
+			{/* Touch Score Numpad Drawer */}
+			<ScoreInputDrawer
+				isOpen={drawerState.isOpen}
+				team={drawerState.team}
+				teamName={drawerState.team === 'them' ? 'Ellos' : 'Nosotros'}
+				teamEmoji={drawerState.team === 'them' ? '🦅' : '🐅'}
+				maxScore={MAX_HAND_SCORE}
+				onClose={closeDrawer}
+				onSubmit={handleDrawerScore}
+			/>
 
 			{winner && (
 				<div

@@ -369,6 +369,7 @@ export default function Home() {
 						<caption class="sr-only">Tabla de puntaje de dominó</caption>
 						<thead>
 							<tr>
+								<th class="roundColHeader">#</th>
 								<th>{team1.emoji} {team1.name}</th>
 								<th>{team2.emoji} {team2.name}</th>
 								<th>Acción</th>
@@ -377,7 +378,7 @@ export default function Home() {
 						<tbody>
 							{hands.length === 0 ? (
 								<tr class="emptyHandsRow">
-									<td colSpan={3}>
+									<td colSpan={4}>
 										<div class="emptyState">
 											<span>🀄</span>
 											<p>No hay manos jugadas aún.<br />Toca un equipo para sumar puntos.</p>

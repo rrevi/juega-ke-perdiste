@@ -6,8 +6,10 @@ export default function Hand({ hand, index, onRemove }) {
 
 	return (
 		<tr class="handRow">
+			<td class="roundNumberCell">
+				<span class="roundBadge">#{index !== undefined ? index + 1 : 1}</span>
+			</td>
 			<td class={`handCell ${themWon ? 'scoringHand' : ''}`}>
-				{index !== undefined && <span class="roundBadge">#{index + 1}</span>}
 				<span class="handScoreValue">{hand.themScore}</span>
 			</td>
 			<td class={`handCell ${usWon ? 'scoringHand' : ''}`}>

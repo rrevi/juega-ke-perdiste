@@ -200,26 +200,22 @@
 }
 
 .emptyHandsRow td {
-	padding: 2.5rem 1rem !important;
+	padding: 2.2rem 1rem !important;
 }
 
 .emptyState {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 6px;
 	color: var(--text-secondary);
-}
-
-.emptyState span {
-	font-size: 2.5rem;
 }
 
 .emptyState p {
 	margin: 0;
-	font-size: 0.9rem;
+	font-size: 0.92rem;
+	font-weight: 500;
 	text-align: center;
-	line-height: 1.4;
+	line-height: 1.5;
 }
 
 .winnerBanner {

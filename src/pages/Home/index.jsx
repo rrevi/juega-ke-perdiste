@@ -336,7 +336,6 @@ export default function Home() {
 								<tr class="emptyHandsRow">
 									<td colSpan={4}>
 										<div class="emptyState">
-											<span>🀄</span>
 											<p>No hay manos jugadas aún.<br />Toca un equipo para sumar puntos.</p>
 										</div>
 									</td>

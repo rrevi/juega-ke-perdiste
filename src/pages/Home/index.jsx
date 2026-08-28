@@ -13,6 +13,30 @@ const MAX_HAND_SCORE = 168;
 const CONFETTI_COUNT = 20;
 const CONFETTI_COLORS = ['#18181b', '#ffffff', '#b8860b', '#dc2626', '#e5a93c', '#5a5a64'];
 
+function getWinningTitle(team) {
+	const name = team.name.trim();
+	const lower = name.toLowerCase();
+	let verb = 'ganó';
+	if (lower === 'nosotros' || lower === 'nosotras') {
+		verb = 'ganamos';
+	} else if (lower === 'ellos' || lower === 'ellas' || lower.endsWith('s')) {
+		verb = 'ganaron';
+	}
+	return `¡${name} ${verb}!`;
+}
+
+function getShareWinningSentence(team, winnerScore, loserScore) {
+	const name = team.name.trim();
+	const lower = name.toLowerCase();
+	let verb = 'ganó';
+	if (lower === 'nosotros' || lower === 'nosotras') {
+		verb = 'ganamos';
+	} else if (lower === 'ellos' || lower === 'ellas' || lower.endsWith('s')) {
+		verb = 'ganaron';
+	}
+	return `🏆 ¡${team.emoji} ${name} ${verb} la partida de Dominó! (${winnerScore} a ${loserScore} pts)`;
+}
+
 function generateConfetti() {
 	const pieces = [];
 	for (let i = 0; i < CONFETTI_COUNT; i++) {
@@ -162,7 +186,9 @@ export default function Home() {
 		const loserTeam = winner === 'them' ? team2 : team1;
 		const loserScore = winner === 'them' ? usTotalScore : themTotalScore;
 
-		const shareText = `🏆 ¡${winnerTeam.emoji} ${winnerTeam.name} ganó la partida de Dominó! (${winnerScore} a ${loserScore} pts)\n\n` +
+		const winnerSentence = getShareWinningSentence(winnerTeam, winnerScore, loserScore);
+
+		const shareText = `${winnerSentence}\n\n` +
 			`📊 Manos jugadas: ${matchStats.totalRounds}\n` +
 			`🔥 Mano más alta: ${matchStats.maxHand} pts\n` +
 			`🎯 Meta: ${winScore} pts\n\n` +
@@ -439,7 +465,7 @@ export default function Home() {
 					<div class="winnerEmoji">
 						{winner === 'them' ? team1.emoji : team2.emoji}
 					</div>
-					<h2 class="winnerText">¡{winner === 'them' ? team1.name : team2.name} Gana!</h2>
+					<h2 class="winnerText">{getWinningTitle(winner === 'them' ? team1 : team2)}</h2>
 
 					{/* Match Stats Summary */}
 					<div class="matchStatsCard">

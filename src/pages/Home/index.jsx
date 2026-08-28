@@ -34,7 +34,7 @@ function getShareWinningSentence(team, winnerScore, loserScore) {
 	} else if (lower === 'ellos' || lower === 'ellas' || lower.endsWith('s')) {
 		verb = 'ganaron';
 	}
-	return `🏆 ¡${team.emoji} ${name} ${verb} la partida de Dominó! (${winnerScore} a ${loserScore} pts)`;
+	return `🏆 ¡${team.emoji} ${name} ${verb} el juego de Dominó! (${winnerScore} a ${loserScore} pts)`;
 }
 
 function generateConfetti() {
@@ -351,10 +351,10 @@ export default function Home() {
 						<caption class="sr-only">Tabla de puntaje de dominó</caption>
 						<thead>
 							<tr>
-								<th class="roundColHeader">#</th>
+								<th class="roundColHeader" aria-label="Número de mano"></th>
 								<th>{team1.emoji} {team1.name}</th>
 								<th>{team2.emoji} {team2.name}</th>
-								<th>Acción</th>
+								<th class="actionColHeader" aria-label="Acción"></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -417,7 +417,7 @@ export default function Home() {
 			{/* Confirm New Game Reset Modal */}
 			<ConfirmModal
 				isOpen={isConfirmResetOpen}
-				title="¿Reiniciar partida?"
+				title="¿Reiniciar juego?"
 				message="Se borrarán todos los puntos y manos registradas."
 				confirmText="Reiniciar"
 				cancelText="Cancelar"

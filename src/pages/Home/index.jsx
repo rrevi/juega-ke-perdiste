@@ -166,7 +166,7 @@ export default function Home() {
 			`📊 Manos jugadas: ${matchStats.totalRounds}\n` +
 			`🔥 Mano más alta: ${matchStats.maxHand} pts\n` +
 			`🎯 Meta: ${winScore} pts\n\n` +
-			`Juega ke perdiste! 🀄`;
+			`Juega ke perdiste!`;
 
 		if (typeof navigator !== 'undefined' && navigator.share) {
 			navigator.share({

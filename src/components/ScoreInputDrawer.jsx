@@ -9,7 +9,7 @@ export default function ScoreInputDrawer({
 	isOpen,
 	team,
 	teamName = 'Equipo',
-	teamEmoji = '🀄',
+	teamEmoji = '',
 	maxScore = 168,
 	onClose,
 	onSubmit

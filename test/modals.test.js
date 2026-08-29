@@ -9,7 +9,7 @@ describe('ConfirmModal', () => {
     const handleConfirm = jest.fn();
     const handleCancel = jest.fn();
 
-    const { rerender } = render(
+    render(
       <ConfirmModal
         isOpen={true}
         title="¿Reiniciar?"

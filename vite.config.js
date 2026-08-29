@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import preact from '@preact/preset-vite';
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
+export default defineConfig(({ command }) => {
 	if (command === 'serve') {
 		return {
 			define: {
@@ -11,10 +11,9 @@ export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
 				global: {}
 			},
 			plugins: [preact()]
-		}
-	} else {
-		return {
-			plugins: [preact()]
-		}
+		};
 	}
+	return {
+		plugins: [preact()]
+	};
 });

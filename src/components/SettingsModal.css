@@ -98,6 +98,10 @@
 	border-color: var(--border);
 }
 
+.scoreOptionChip:active {
+	transform: scale(0.96);
+}
+
 .teamEditRow {
 	display: flex;
 	flex-direction: column;
@@ -152,4 +156,9 @@
 	font-size: 1.05rem;
 	font-weight: 700;
 	border: 1px solid var(--border);
+	transition: transform 0.1s ease, background-color 0.15s ease;
+}
+
+.settingsSaveBtn:active {
+	transform: scale(0.98);
 }

@@ -87,6 +87,7 @@ export default function ScoreInputDrawer({
 	return (
 		<div class="drawerBackdrop" onClick={onClose} role="dialog" aria-modal="true">
 			<div class="drawerContainer" onClick={(e) => e.stopPropagation()}>
+				<div class="drawerDragHandle" aria-hidden="true" />
 				<div class="drawerHeader">
 					<div class="drawerTitle">
 						<span class="drawerEmoji">{teamEmoji}</span>

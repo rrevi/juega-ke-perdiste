@@ -1,3 +1,14 @@
+@keyframes slideUpDrawer {
+	from {
+		transform: translateY(100%);
+		opacity: 0.8;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
 .drawerBackdrop {
 	position: fixed;
 	inset: 0;
@@ -12,16 +23,25 @@
 
 .drawerContainer {
 	background-color: var(--bg);
-	border-top-left-radius: 20px;
-	border-top-right-radius: 20px;
+	border-top-left-radius: 24px;
+	border-top-right-radius: 24px;
 	width: 100%;
 	max-width: 480px;
-	padding: 16px 18px max(20px, env(safe-area-inset-bottom));
-	box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.2);
-	animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+	padding: 10px 18px max(20px, env(safe-area-inset-bottom));
+	box-shadow: 0 -10px 32px rgba(0, 0, 0, 0.28);
+	animation: slideUpDrawer 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
+}
+
+.drawerDragHandle {
+	width: 36px;
+	height: 4px;
+	border-radius: 2px;
+	background-color: var(--text-secondary);
+	opacity: 0.35;
+	margin: 0 auto 4px;
 }
 
 .drawerHeader {

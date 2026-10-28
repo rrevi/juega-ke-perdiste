@@ -137,10 +137,10 @@ main {
 input {
 	font-size: 1rem;
 	color: var(--text);
-	text-align: center;
 	background-color: var(--surface);
 	border: 1px solid var(--border);
-	text-indent: 17px;
+	border-radius: 8px;
+	padding: 8px 12px;
 	transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -159,20 +159,14 @@ input.invalid {
 	animation: shake 0.4s ease-in-out;
 }
 
-input,
-select,
-textarea {
-	width: 195px;
-}
-
 button {
 	color: var(--text);
 	background-color: var(--surface);
-	border-color: var(--border);
+	border: 1px solid var(--border);
 	cursor: pointer;
 	user-select: none;
 	-webkit-user-select: none;
-	transition: background-color 0.2s ease, transform 0.1s ease;
+	transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }
 
 .button,
@@ -184,18 +178,18 @@ textarea {
 }
 
 button:hover,
-button:enabled:hover,
-button:focus {
-	outline: solid var(--border);
+button:enabled:hover {
 	background-color: var(--surface-hover);
-	border: 1px solid var(--border);
+}
+
+button:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
 }
 
 button:active,
 button:enabled:active {
-	outline: solid var(--border);
-	background-color: var(--bg);
-	border: 1px solid var(--border);
+	background-color: var(--surface-hover);
 	transform: scale(0.97);
 }
 

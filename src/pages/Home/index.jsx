@@ -261,6 +261,35 @@ export default function Home() {
 		<div class="home">
 			{/* Sticky Top Scoreboard */}
 			<div class="stickyScoreboard">
+				<div class="scoreboardTopBar">
+					<button
+						type="button"
+						id="settingsButton"
+						class="scoreboardUtilBtn settingsTriggerBtn"
+						onClick={() => {
+							triggerHaptic('tap');
+							setIsSettingsOpen(true);
+						}}
+						title="Ajustes"
+						aria-label="Ajustes"
+					>
+						<span class="utilIcon" aria-hidden="true">⚙️</span>
+						<span class="utilLabel">Meta: {winScore}</span>
+					</button>
+
+					<button
+						type="button"
+						id="newGameButton"
+						class="scoreboardUtilBtn newGameButton"
+						onClick={newGameButtonClick}
+						title="Nuevo Juego"
+						aria-label="Nuevo Juego"
+					>
+						<span class="utilIcon" aria-hidden="true">&#8635;</span>
+						<span class="utilLabel">Reiniciar</span>
+					</button>
+				</div>
+
 				<div class="scoreboardContainer">
 					<div
 						class={`teamCard themTeamCard clickableTeamCard ${themTotalScore > usTotalScore && themTotalScore > 0 ? 'isLeading' : ''}`}
@@ -273,52 +302,17 @@ export default function Home() {
 						<div class="teamHeader">
 							<span class="teamEmoji" role="img" aria-label={team1.name}>{team1.emoji}</span>
 							<span class="teamLabel">{team1.name}</span>
+							{themTotalScore > usTotalScore && themTotalScore > 0 && (
+								<span class="leaderCrown" title="Liderando" aria-label="Liderando">👑</span>
+							)}
 						</div>
 						<div class="teamScore" id="themTotalScore" title="&#x1F985; Puntaje Total" aria-live="polite">
 							{themTotalScore}
 						</div>
-						<div class="teamProgressBar">
-							<div class="teamProgressFill" style={{ width: `${themPercent}%` }} />
-						</div>
-						<span class="teamProgressLabel">{themPercent}%</span>
 					</div>
 
 					<div class="scoreboardCenter">
 						<div class="scoreDivider">VS</div>
-						<div class="centerControls">
-							<button
-								type="button"
-								id="newGameButton"
-								class="newGameButton"
-								onClick={newGameButtonClick}
-								title="Nuevo Juego"
-								aria-label="Nuevo Juego">
-									&#8635;
-							</button>
-							<button
-								type="button"
-								id="settingsButton"
-								class="settingsTriggerBtn"
-								onClick={() => {
-									triggerHaptic('tap');
-									setIsSettingsOpen(true);
-								}}
-								title="Ajustes"
-								aria-label="Ajustes">
-									⚙️
-							</button>
-						</div>
-						<button
-							type="button"
-							class="targetScorePill"
-							onClick={() => {
-								triggerHaptic('tap');
-								setIsSettingsOpen(true);
-							}}
-							title="Meta para ganar"
-						>
-							Meta: {winScore}
-						</button>
 					</div>
 
 					<div
@@ -332,14 +326,13 @@ export default function Home() {
 						<div class="teamHeader">
 							<span class="teamEmoji" role="img" aria-label={team2.name}>{team2.emoji}</span>
 							<span class="teamLabel">{team2.name}</span>
+							{usTotalScore > themTotalScore && usTotalScore > 0 && (
+								<span class="leaderCrown" title="Liderando" aria-label="Liderando">👑</span>
+							)}
 						</div>
 						<div class="teamScore" id="usTotalScore" title="&#x1F405; Puntaje Total" aria-live="polite">
 							{usTotalScore}
 						</div>
-						<div class="teamProgressBar">
-							<div class="teamProgressFill" style={{ width: `${usPercent}%` }} />
-						</div>
-						<span class="teamProgressLabel">{usPercent}%</span>
 					</div>
 				</div>
 			</div>

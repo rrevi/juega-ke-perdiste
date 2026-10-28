@@ -286,7 +286,7 @@ export default function Home() {
 						aria-label="Nuevo Juego"
 					>
 						<span class="utilIcon" aria-hidden="true">&#8635;</span>
-						<span class="utilLabel">Reiniciar</span>
+						<span class="utilLabel">Nuevo</span>
 					</button>
 				</div>
 

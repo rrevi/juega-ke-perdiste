@@ -4,6 +4,14 @@ import { render, fireEvent, screen } from '@testing-library/preact';
 import ScoreInputDrawer from '../src/components/ScoreInputDrawer';
 
 describe('ScoreInputDrawer', () => {
+  beforeAll(() => {
+    if (typeof window !== 'undefined' && window.HTMLElement) {
+      window.HTMLElement.prototype.ontouchstart = null;
+      window.HTMLElement.prototype.ontouchmove = null;
+      window.HTMLElement.prototype.ontouchend = null;
+    }
+  });
+
   test('should render when isOpen is true and handle keypad & preset clicks', () => {
     const handleSubmit = jest.fn();
     const handleClose = jest.fn();
@@ -150,5 +158,38 @@ describe('ScoreInputDrawer', () => {
     fireEvent.click(overflowSaveBtn);
     expect(handleSubmit).not.toHaveBeenCalled();
     expect(screen.getByText(/Máximo: 100 pts/i)).toBeTruthy();
+  });
+
+  test('should dismiss drawer on swipe down beyond threshold and spring back on small drag', () => {
+    const handleClose = jest.fn();
+    const { container } = render(
+      <ScoreInputDrawer
+        isOpen={true}
+        team="them"
+        teamName="Ellos"
+        teamEmoji="🦅"
+        onClose={handleClose}
+        onSubmit={jest.fn()}
+      />
+    );
+
+    const handle = container.querySelector('.drawerDragHandleArea');
+
+    // Small drag: deltaY = 30 (< 80)
+    fireEvent.touchStart(handle, { touches: [{ clientY: 100 }] });
+    fireEvent.touchMove(handle, { touches: [{ clientY: 130 }] });
+    fireEvent.touchEnd(handle);
+    expect(handleClose).not.toHaveBeenCalled();
+
+    // Large drag: deltaY = 120 (> 80)
+    fireEvent.touchStart(handle, { touches: [{ clientY: 100 }] });
+    fireEvent.touchMove(handle, { touches: [{ clientY: 220 }] });
+    fireEvent.touchEnd(handle);
+    expect(handleClose).toHaveBeenCalledTimes(1);
+
+    // Upward drag with dampened resistance
+    fireEvent.touchStart(handle, { touches: [{ clientY: 100 }] });
+    fireEvent.touchMove(handle, { touches: [{ clientY: 80 }] });
+    fireEvent.touchEnd(handle);
   });
 });

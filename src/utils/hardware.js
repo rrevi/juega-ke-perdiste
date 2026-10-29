@@ -4,9 +4,30 @@
 
 let wakeLockSentinel = null;
 let isWakeLockRequested = false;
+const wakeLockListeners = [];
+let lastNotifiedState = null;
 
 export function isWakeLockSupported() {
   return typeof navigator !== 'undefined' && 'wakeLock' in navigator;
+}
+
+export function isWakeLockActive() {
+  return !!wakeLockSentinel && !wakeLockSentinel.released;
+}
+
+export function onWakeLockChange(cb) {
+  wakeLockListeners.push(cb);
+  return () => {
+    const idx = wakeLockListeners.indexOf(cb);
+    if (idx !== -1) wakeLockListeners.splice(idx, 1);
+  };
+}
+
+function notifyWakeLockChange(active) {
+  if (lastNotifiedState !== active) {
+    lastNotifiedState = active;
+    wakeLockListeners.forEach(cb => cb(active));
+  }
 }
 
 export async function requestWakeLock() {
@@ -15,13 +36,16 @@ export async function requestWakeLock() {
   try {
     if (!wakeLockSentinel || wakeLockSentinel.released) {
       wakeLockSentinel = await navigator.wakeLock.request('screen');
+      notifyWakeLockChange(true);
       wakeLockSentinel.addEventListener('release', () => {
         wakeLockSentinel = null;
+        notifyWakeLockChange(false);
       });
     }
     return true;
   } catch (err) {
     console.warn('Wake Lock request failed:', err);
+    notifyWakeLockChange(false);
     return false;
   }
 }
@@ -35,6 +59,16 @@ export async function releaseWakeLock() {
       console.warn('Wake Lock release failed:', err);
     }
     wakeLockSentinel = null;
+  }
+  notifyWakeLockChange(false);
+}
+
+export async function toggleWakeLock() {
+  if (isWakeLockActive()) {
+    await releaseWakeLock();
+    return false;
+  } else {
+    return await requestWakeLock();
   }
 }
 

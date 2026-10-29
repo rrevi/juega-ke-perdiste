@@ -74,11 +74,13 @@
 	50% { box-shadow: 0 0 60px var(--accent), 0 0 90px var(--accent); }
 }
 
+html,
 body {
 	margin: 0;
 	background-color: var(--bg);
 	color: var(--text);
 	display: block;
+	overscroll-behavior-y: none;
 }
 
 #app {

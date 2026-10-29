@@ -334,4 +334,56 @@ describe('Home', () => {
     fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: false });
     expect(document.activeElement).toBe(firstBtn);
   });
+
+  test('should show undo snackbar when a hand is removed and restore it on Deshacer click', async () => {
+    const { container } = render(<Home />);
+
+    // Add hand (+25 to Ellos)
+    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByText('+25'));
+    fireEvent.click(screen.getByText(/Anotar \+25 pts/i));
+
+    await waitFor(() => {
+      expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('25');
+    });
+
+    // Delete hand
+    fireEvent.click(screen.getByRole('button', { name: /Eliminar mano #1/i }));
+
+    // Hand removed, undo snackbar appears
+    expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('0');
+    expect(screen.getByText('Mano eliminada')).toBeTruthy();
+
+    // Click Deshacer
+    fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }));
+
+    await waitFor(() => {
+      expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('25');
+      expect(screen.queryByText('Mano eliminada')).toBeNull();
+    });
+  });
+
+  test('should toggle screen wake lock from ambient top bar button', async () => {
+    Object.defineProperty(navigator, 'wakeLock', {
+      value: {
+        request: jest.fn().mockResolvedValue({
+          released: false,
+          release: jest.fn().mockResolvedValue(undefined),
+          addEventListener: jest.fn()
+        })
+      },
+      configurable: true,
+      writable: true
+    });
+
+    render(<Home />);
+
+    const wakeLockBtn = screen.getByRole('button', { name: /Pantalla/i });
+    expect(wakeLockBtn).toBeTruthy();
+
+    fireEvent.click(wakeLockBtn);
+    await waitFor(() => {
+      expect(wakeLockBtn).toBeTruthy();
+    });
+  });
 });

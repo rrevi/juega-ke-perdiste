@@ -5,7 +5,15 @@ import Hand from '../../components/Hand';
 import ScoreInputDrawer from '../../components/ScoreInputDrawer';
 import ConfirmModal from '../../components/ConfirmModal';
 import SettingsModal from '../../components/SettingsModal';
-import { requestWakeLock, releaseWakeLock, triggerHaptic } from '../../utils/hardware';
+import {
+	requestWakeLock,
+	releaseWakeLock,
+	toggleWakeLock,
+	isWakeLockActive,
+	onWakeLockChange,
+	isWakeLockSupported,
+	triggerHaptic
+} from '../../utils/hardware';
 import './style.css';
 
 const WIN_SCORE = 200;
@@ -92,8 +100,41 @@ export default function Home() {
 
 	const [isConfirmResetOpen, setIsConfirmResetOpen] = useState(false);
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+	const [wakeLockActive, setWakeLockActive] = useState(() => isWakeLockActive());
+	const [undoState, setUndoState] = useState(null);
 
 	const winnerModalRef = useRef(null);
+	const handsBodyRef = useRef(null);
+	const prevHandsLengthRef = useRef(hands.length);
+	const undoTimeoutRef = useRef(null);
+
+	useEffect(() => {
+		const unsubscribe = onWakeLockChange((active) => {
+			setWakeLockActive(active);
+		});
+		return unsubscribe;
+	}, []);
+
+	useEffect(() => {
+		if (hands.length > prevHandsLengthRef.current) {
+			if (handsBodyRef.current) {
+				if (typeof handsBodyRef.current.scrollTo === 'function') {
+					handsBodyRef.current.scrollTo({
+						top: handsBodyRef.current.scrollHeight,
+						behavior: 'smooth'
+					});
+				} else {
+					handsBodyRef.current.scrollTop = handsBodyRef.current.scrollHeight;
+				}
+			}
+		}
+		prevHandsLengthRef.current = hands.length;
+	}, [hands.length]);
+
+	const handleToggleWakeLock = useCallback(async () => {
+		triggerHaptic('tap');
+		await toggleWakeLock();
+	}, []);
 
 	const openDrawer = useCallback((team) => {
 		triggerHaptic('tap');
@@ -207,10 +248,35 @@ export default function Home() {
 		}
 	}, [winner, team1, team2, themTotalScore, usTotalScore, matchStats, winScore]);
 
-	const removeHand = useCallback((hand) => {
+	const removeHand = useCallback((hand, index) => {
 		triggerHaptic('remove');
+		if (undoTimeoutRef.current) {
+			clearTimeout(undoTimeoutRef.current);
+		}
 		model.destroy(hand);
+		setUndoState({ hand, index });
+
+		undoTimeoutRef.current = setTimeout(() => {
+			setUndoState(null);
+			undoTimeoutRef.current = null;
+		}, 5000);
 	}, []);
+
+	const undoDeleteHand = useCallback(() => {
+		if (!undoState) return;
+		triggerHaptic('success');
+		if (undoTimeoutRef.current) {
+			clearTimeout(undoTimeoutRef.current);
+			undoTimeoutRef.current = null;
+		}
+		const restored = [...model.hands];
+		const targetIndex = typeof undoState.index === 'number' ? Math.min(undoState.index, restored.length) : restored.length;
+		restored.splice(targetIndex, 0, undoState.hand);
+		model.hands = restored;
+		model.persist();
+		model.inform();
+		setUndoState(null);
+	}, [undoState]);
 
 	const newGameButtonClick = useCallback(() => {
 		triggerHaptic('tap');
@@ -276,13 +342,27 @@ export default function Home() {
 					<span class="utilLabel">Meta: {winScore}</span>
 				</button>
 
+				{isWakeLockSupported() && (
+					<button
+						type="button"
+						id="wakeLockButton"
+						class={`appControlBtn wakeLockBtn ${wakeLockActive ? 'isAwake' : ''}`}
+						onClick={handleToggleWakeLock}
+						title={wakeLockActive ? 'Pantalla activa (no se suspenderá)' : 'Pantalla normal'}
+						aria-label={wakeLockActive ? 'Pantalla activa' : 'Pantalla normal'}
+					>
+						<span class="utilIcon" aria-hidden="true">{wakeLockActive ? '☀️' : '🌙'}</span>
+						<span class="utilLabel">{wakeLockActive ? 'Activa' : 'Normal'}</span>
+					</button>
+				)}
+
 				<button
 					type="button"
 					id="newGameButton"
 					class="appControlBtn newGameButton"
 					onClick={newGameButtonClick}
-					title="Nuevo Juego"
-					aria-label="Nuevo Juego"
+					title="Nuevo juego"
+					aria-label="Nuevo juego"
 				>
 					<span class="utilIcon" aria-hidden="true">&#8635;</span>
 					<span class="utilLabel">Nuevo</span>
@@ -319,7 +399,7 @@ export default function Home() {
 				</div>
 
 				{/* Continuous Hands History List */}
-				<div class="scorecardHandsBody">
+				<div class="scorecardHandsBody" ref={handsBodyRef}>
 					<table class="gameHands">
 						<caption class="sr-only">Tabla de puntaje de dominó</caption>
 						<tbody>
@@ -337,7 +417,7 @@ export default function Home() {
 										key={hand._id}
 										hand={hand}
 										index={idx}
-										onRemove={() => removeHand(hand)}
+										onRemove={() => removeHand(hand, idx)}
 									/>
 								))
 							)}
@@ -346,7 +426,16 @@ export default function Home() {
 				</div>
 			</section>
 
-			{/* Bottom Action Area */}
+			{/* Floating Undo Snackbar */}
+			{undoState && (
+				<div class="undoSnackbar" role="status" aria-live="polite">
+					<span class="undoText">Mano eliminada</span>
+					<button type="button" class="undoActionBtn" onClick={undoDeleteHand}>
+						Deshacer
+					</button>
+				</div>
+			)}
+
 			{/* Bottom Action Footer */}
 			<footer class="inputSection">
 				<div class="primaryTouchActions">

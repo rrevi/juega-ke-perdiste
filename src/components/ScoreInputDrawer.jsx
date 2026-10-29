@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState, useEffect, useCallback } from 'preact/hooks';
+import { useState, useEffect, useRef } from 'preact/hooks';
 import { triggerHaptic } from '../utils/hardware';
 import './ScoreInputDrawer.css';
 
@@ -16,15 +16,48 @@ export default function ScoreInputDrawer({
 }) {
 	const [value, setValue] = useState('');
 	const [error, setError] = useState(false);
+	const [dragY, setDragY] = useState(0);
+	const [isDragging, setIsDragging] = useState(false);
+	const touchStartY = useRef(0);
+	const currentDragY = useRef(0);
 
 	useEffect(() => {
 		if (isOpen) {
 			setValue('');
 			setError(false);
+			setDragY(0);
+			currentDragY.current = 0;
+			setIsDragging(false);
 		}
 	}, [isOpen]);
 
 	if (!isOpen) return null;
+
+	const handleTouchStart = (e) => {
+		const clientY = (e.touches && e.touches[0] && e.touches[0].clientY) || (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientY) || e.clientY || 0;
+		touchStartY.current = clientY;
+		currentDragY.current = 0;
+		setIsDragging(true);
+	};
+
+	const handleTouchMove = (e) => {
+		const clientY = (e.touches && e.touches[0] && e.touches[0].clientY) || (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientY) || e.clientY || 0;
+		const delta = clientY - (touchStartY.current || 0);
+		const finalDelta = delta > 0 ? delta : delta * 0.2;
+		currentDragY.current = finalDelta;
+		setDragY(finalDelta);
+	};
+
+	const handleTouchEnd = () => {
+		if (currentDragY.current > 80) {
+			triggerHaptic('tap');
+			onClose();
+		}
+		currentDragY.current = 0;
+		setDragY(0);
+		setIsDragging(false);
+		touchStartY.current = null;
+	};
 
 	const handleDigit = (digit) => {
 		triggerHaptic('tap');
@@ -86,9 +119,28 @@ export default function ScoreInputDrawer({
 
 	return (
 		<div class="drawerBackdrop" onClick={onClose} role="dialog" aria-modal="true">
-			<div class="drawerContainer" onClick={(e) => e.stopPropagation()}>
-				<div class="drawerDragHandle" aria-hidden="true" />
-				<div class="drawerHeader">
+			<div
+				class="drawerContainer"
+				onClick={(e) => e.stopPropagation()}
+				style={{
+					transform: dragY ? `translateY(${Math.max(0, dragY)}px)` : undefined,
+					transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+				}}
+			>
+				<div
+					class="drawerDragHandleArea"
+					onTouchStart={handleTouchStart}
+					onTouchMove={handleTouchMove}
+					onTouchEnd={handleTouchEnd}
+				>
+					<div class="drawerDragHandle" aria-hidden="true" />
+				</div>
+				<div
+					class="drawerHeader"
+					onTouchStart={handleTouchStart}
+					onTouchMove={handleTouchMove}
+					onTouchEnd={handleTouchEnd}
+				>
 					<div class="drawerTitle">
 						<span class="drawerEmoji">{teamEmoji}</span>
 						<span>Sumar a <strong>{teamName}</strong></span>

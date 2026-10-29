@@ -55,6 +55,12 @@
 	font-size: 0.74rem;
 }
 
+.wakeLockBtn.isAwake {
+	color: var(--brass);
+	border-color: rgba(184, 134, 11, 0.4);
+	background-color: rgba(184, 134, 11, 0.08);
+}
+
 /* Unified Scorecard Board (Pure Score Keeping Section) */
 .scorecardBoard {
 	width: calc(100% - 20px);
@@ -455,6 +461,107 @@
 	font-size: 1.25rem;
 }
 
+/* Floating Undo Snackbar */
+.undoSnackbar {
+	position: fixed;
+	bottom: calc(70px + max(12px, env(safe-area-inset-bottom)));
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: var(--text);
+	color: var(--bg);
+	padding: 8px 16px;
+	border-radius: 999px;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+	z-index: 95;
+	animation: slideUpDrawer 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	font-size: 0.88rem;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.undoText {
+	opacity: 0.95;
+}
+
+.undoActionBtn {
+	background: transparent;
+	color: var(--brass);
+	border: 1px solid var(--brass);
+	border-radius: 999px;
+	padding: 3px 10px;
+	font-size: 0.8rem;
+	font-weight: 700;
+	cursor: pointer;
+	letter-spacing: 0.3px;
+	transition: all 0.15s ease;
+}
+
+.undoActionBtn:hover,
+.undoActionBtn:active {
+	background-color: rgba(184, 134, 11, 0.2);
+}
+
+/* Tabletop Landscape Mode */
+@media (orientation: landscape) and (max-height: 520px) {
+	.home {
+		max-width: 100%;
+		padding: 0 16px;
+	}
+
+	.topControlsBar {
+		padding: 4px 8px 2px;
+	}
+
+	.scorecardBoard {
+		margin: 2px 0 6px;
+		display: grid;
+		grid-template-columns: 140px 1fr 140px;
+		grid-template-rows: 1fr;
+	}
+
+	.scorecardTotalsHeader {
+		display: contents;
+	}
+
+	.themTotalDisplay {
+		grid-column: 1;
+		grid-row: 1;
+		border-right: 1px solid rgba(0, 0, 0, 0.08);
+		padding: 8px;
+		justify-content: center;
+	}
+
+	.scoreboardCenter {
+		display: none;
+	}
+
+	.usTotalDisplay {
+		grid-column: 3;
+		grid-row: 1;
+		border-left: 1px solid rgba(0, 0, 0, 0.08);
+		padding: 8px;
+		justify-content: center;
+	}
+
+	.scorecardHandsBody {
+		grid-column: 2;
+		grid-row: 1;
+		padding: 0 12px;
+	}
+
+	.inputSection {
+		padding: 4px 12px max(6px, env(safe-area-inset-bottom));
+	}
+
+	.touchScoreBtn {
+		height: 40px;
+		font-size: 0.88rem;
+	}
+}
+
 @media (max-width: 639px) {
 	.winnerEmoji {
 		font-size: 60px;
@@ -485,5 +592,18 @@
 	.inputSection {
 		border-top: 1px solid rgba(255, 255, 255, 0.1);
 		box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.25);
+	}
+	.wakeLockBtn.isAwake {
+		border-color: rgba(229, 169, 60, 0.4);
+		background-color: rgba(229, 169, 60, 0.12);
+		color: var(--brass);
+	}
+	@media (orientation: landscape) and (max-height: 520px) {
+		.themTotalDisplay {
+			border-right-color: rgba(255, 255, 255, 0.1);
+		}
+		.usTotalDisplay {
+			border-left-color: rgba(255, 255, 255, 0.1);
+		}
 	}
 }

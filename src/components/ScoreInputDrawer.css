@@ -35,13 +35,23 @@
 	gap: 12px;
 }
 
+.drawerDragHandleArea {
+	width: 100%;
+	padding: 2px 0 6px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	touch-action: none;
+	cursor: grab;
+}
+
 .drawerDragHandle {
-	width: 36px;
-	height: 4px;
-	border-radius: 2px;
+	width: 40px;
+	height: 4.5px;
+	border-radius: 999px;
 	background-color: var(--text-secondary);
 	opacity: 0.35;
-	margin: 0 auto 4px;
+	margin: 0 auto;
 }
 
 .drawerHeader {

@@ -6,15 +6,15 @@ export default function Hand({ hand, index, onRemove }) {
 
 	return (
 		<tr class="handRow">
-			<td class="roundNumberCell">
-				<span class="roundBadge">#{index !== undefined ? index + 1 : 1}</span>
-			</td>
-			<td class={`handCell ${themWon ? 'scoringHand' : 'zeroHand'}`}>
+			<td class={`handCell themHandCell ${themWon ? 'scoringHand' : 'zeroHand'}`}>
 				<span class="handScoreValue" aria-label={`${hand.themScore} puntos`}>
 					{themWon ? hand.themScore : '—'}
 				</span>
 			</td>
-			<td class={`handCell ${usWon ? 'scoringHand' : 'zeroHand'}`}>
+			<td class="roundNumberCell">
+				<span class="roundBadge">#{index !== undefined ? index + 1 : 1}</span>
+			</td>
+			<td class={`handCell usHandCell ${usWon ? 'scoringHand' : 'zeroHand'}`}>
 				<span class="handScoreValue" aria-label={`${hand.usScore} puntos`}>
 					{usWon ? hand.usScore : '—'}
 				</span>

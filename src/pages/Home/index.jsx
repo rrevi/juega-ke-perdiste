@@ -120,11 +120,11 @@ export default function Home() {
 			if (handsBodyRef.current) {
 				if (typeof handsBodyRef.current.scrollTo === 'function') {
 					handsBodyRef.current.scrollTo({
-						top: handsBodyRef.current.scrollHeight,
+						top: 0,
 						behavior: 'smooth'
 					});
 				} else {
-					handsBodyRef.current.scrollTop = handsBodyRef.current.scrollHeight;
+					handsBodyRef.current.scrollTop = 0;
 				}
 			}
 		}
@@ -335,11 +335,10 @@ export default function Home() {
 						triggerHaptic('tap');
 						setIsSettingsOpen(true);
 					}}
-					title="Ajustes"
-					aria-label="Ajustes"
+					title={`Ajustes (Meta: ${winScore})`}
+					aria-label={`Ajustes (Meta: ${winScore})`}
 				>
 					<span class="utilIcon" aria-hidden="true">⚙️</span>
-					<span class="utilLabel">Meta: {winScore}</span>
 				</button>
 
 				{isWakeLockSupported() && (
@@ -352,7 +351,6 @@ export default function Home() {
 						aria-label={wakeLockActive ? 'Pantalla activa' : 'Pantalla normal'}
 					>
 						<span class="utilIcon" aria-hidden="true">{wakeLockActive ? '☀️' : '🌙'}</span>
-						<span class="utilLabel">{wakeLockActive ? 'Activa' : 'Normal'}</span>
 					</button>
 				)}
 
@@ -365,7 +363,6 @@ export default function Home() {
 					aria-label="Nuevo juego"
 				>
 					<span class="utilIcon" aria-hidden="true">&#8635;</span>
-					<span class="utilLabel">Nuevo</span>
 				</button>
 			</div>
 
@@ -405,21 +402,24 @@ export default function Home() {
 						<tbody>
 							{hands.length === 0 ? (
 								<tr class="emptyHandsRow">
-									<td colSpan={3}>
+									<td colSpan={4}>
 										<div class="emptyState">
 											<p>Suma puntos con los botones de abajo.</p>
 										</div>
 									</td>
 								</tr>
 							) : (
-								hands.map((hand, idx) => (
-									<Hand
-										key={hand._id}
-										hand={hand}
-										index={idx}
-										onRemove={() => removeHand(hand, idx)}
-									/>
-								))
+								hands
+									.map((hand, idx) => ({ hand, idx }))
+									.reverse()
+									.map(({ hand, idx }) => (
+										<Hand
+											key={hand._id}
+											hand={hand}
+											index={idx}
+											onRemove={() => removeHand(hand, idx)}
+										/>
+									))
 							)}
 						</tbody>
 					</table>

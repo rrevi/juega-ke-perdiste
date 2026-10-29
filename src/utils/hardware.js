@@ -67,9 +67,8 @@ export async function toggleWakeLock() {
   if (isWakeLockActive()) {
     await releaseWakeLock();
     return false;
-  } else {
-    return await requestWakeLock();
   }
+  return await requestWakeLock();
 }
 
 // Re-acquire wake lock automatically when returning to the tab if active

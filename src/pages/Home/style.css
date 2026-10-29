@@ -22,13 +22,11 @@
 .appControlBtn {
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
-	height: 30px;
-	padding: 0 12px;
-	border-radius: 999px;
-	font-size: 0.75rem;
-	font-weight: 700;
-	letter-spacing: 0.3px;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	border-radius: 50%;
 	background-color: var(--surface);
 	border: 1px solid rgba(0, 0, 0, 0.12);
 	color: var(--text-secondary);
@@ -43,16 +41,20 @@
 }
 
 .appControlBtn:active {
-	transform: scale(0.96);
+	transform: scale(0.92);
 }
 
 .appControlBtn .utilIcon {
-	font-size: 0.9rem;
+	font-size: 1rem;
 	line-height: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-.appControlBtn .utilLabel {
-	font-size: 0.74rem;
+.newGameButton .utilIcon {
+	font-size: 1.25rem;
+	font-weight: 700;
 }
 
 .wakeLockBtn.isAwake {

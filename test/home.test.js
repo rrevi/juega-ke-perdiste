@@ -105,11 +105,36 @@ describe('Home', () => {
     });
 
     // Delete hand 1
-    fireEvent.click(screen.getAllByText("-")[0]);
+    fireEvent.click(screen.getByRole('button', { name: /Eliminar mano #1/i }));
 
     await waitFor(() => {
       expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('0');
       expect(screen.getByTitle("🐅 Puntaje Total").innerHTML).toMatch('20');
+    });
+  });
+
+  test('should display hands in inverted order with newest hand on top', async () => {
+    const { container } = render(<Home />);
+
+    // Add hand 1 (+10 to Ellos)
+    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByText('+10'));
+    fireEvent.click(screen.getByText(/Anotar \+10 pts/i));
+
+    // Add hand 2 (+20 to Nosotros)
+    fireEvent.click(container.querySelector('#usAddScoreBtn'));
+    fireEvent.click(screen.getByText('+20'));
+    fireEvent.click(screen.getByText(/Anotar \+20 pts/i));
+
+    await waitFor(() => {
+      const rows = container.querySelectorAll('.handRow');
+      expect(rows.length).toBe(2);
+      // Newest hand (Hand #2) is on top
+      expect(rows[0].textContent).toContain('#2');
+      expect(rows[0].textContent).toContain('20');
+      // Oldest hand (Hand #1) is at the bottom
+      expect(rows[1].textContent).toContain('#1');
+      expect(rows[1].textContent).toContain('10');
     });
   });
 

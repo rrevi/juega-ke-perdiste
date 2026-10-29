@@ -34,7 +34,7 @@ function getShareWinningSentence(team, winnerScore, loserScore) {
 	} else if (lower === 'ellos' || lower === 'ellas' || lower.endsWith('s')) {
 		verb = 'ganaron';
 	}
-	return `🏆 ¡${team.emoji} ${name} ${verb} el juego de Dominó! (${winnerScore} a ${loserScore} pts)`;
+	return `🏆 ¡${team.emoji} ${name} ${verb}! (${winnerScore} a ${loserScore} pts)`;
 }
 
 function generateConfetti() {
@@ -189,7 +189,7 @@ export default function Home() {
 		const winnerSentence = getShareWinningSentence(winnerTeam, winnerScore, loserScore);
 
 		const shareText = `${winnerSentence}\n\n` +
-			`📊 Manos jugadas: ${matchStats.totalRounds}\n` +
+			`📊 Manos: ${matchStats.totalRounds}\n` +
 			`🔥 Mano más alta: ${matchStats.maxHand} pts\n` +
 			`🎯 Meta: ${winScore} pts\n\n` +
 			`Juega ke perdiste!`;
@@ -327,7 +327,7 @@ export default function Home() {
 								<tr class="emptyHandsRow">
 									<td colSpan={3}>
 										<div class="emptyState">
-											<p>No hay manos jugadas aún.<br />Usa los botones abajo para sumar puntos.</p>
+											<p>Suma puntos con los botones de abajo.</p>
 										</div>
 									</td>
 								</tr>
@@ -383,7 +383,7 @@ export default function Home() {
 			<ConfirmModal
 				isOpen={isConfirmResetOpen}
 				title="¿Reiniciar juego?"
-				message="Se borrarán todos los puntos y manos registradas."
+				message="Se borrarán todos los puntos."
 				confirmText="Reiniciar"
 				cancelText="Cancelar"
 				isDanger={true}
@@ -435,28 +435,28 @@ export default function Home() {
 					{/* Match Stats Summary */}
 					<div class="matchStatsCard">
 						<div class="statItem">
-							<span class="statLabel">Marcador Final</span>
+							<span class="statLabel">Marcador final</span>
 							<span class="statValue">{themTotalScore} - {usTotalScore}</span>
 						</div>
 						<div class="statItem">
-							<span class="statLabel">Manos Jugadas</span>
+							<span class="statLabel">Manos jugadas</span>
 							<span class="statValue">{matchStats.totalRounds}</span>
 						</div>
 						<div class="statItem">
-							<span class="statLabel">Mano Más Alta</span>
+							<span class="statLabel">Mano más alta</span>
 							<span class="statValue">+{matchStats.maxHand} pts</span>
 						</div>
 					</div>
 
 					<div class="winnerActions">
 						<button type="button" class="winnerShareBtn" onClick={shareScorecard}>
-							{copiedToast ? '✓ ¡Copiado!' : '📤 Compartir Resultado'}
+							{copiedToast ? '✓ Copiado' : '📤 Compartir'}
 						</button>
 						<button type="button" onClick={dismissWinner}>Continuar</button>
 						<button type="button" class="winnerNewGameBtn" onClick={() => {
 							dismissWinner();
 							model.destroyAll();
-						}}>Nuevo Juego</button>
+						}}>Nuevo juego</button>
 					</div>
 				</div>
 			)}

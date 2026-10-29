@@ -47,7 +47,7 @@ export default function SettingsModal({
 		<div class="settingsBackdrop" onClick={onClose} role="dialog" aria-modal="true">
 			<div class="settingsContainer" onClick={(e) => e.stopPropagation()}>
 				<div class="settingsHeader">
-					<h3 class="settingsTitle">⚙️ Ajustes del Juego</h3>
+					<h3 class="settingsTitle">⚙️ Ajustes</h3>
 					<button type="button" class="settingsCloseBtn" onClick={onClose} aria-label="Cerrar">
 						✕
 					</button>
@@ -56,7 +56,7 @@ export default function SettingsModal({
 				<div class="settingsBody">
 					{/* Win Target Score */}
 					<div class="settingsGroup">
-						<label class="settingsGroupTitle">Puntaje para ganar:</label>
+						<label class="settingsGroupTitle">Meta de puntos:</label>
 						<div class="scoreOptionsGrid">
 							{WIN_SCORE_OPTIONS.map((score) => (
 								<button
@@ -83,7 +83,7 @@ export default function SettingsModal({
 								class="teamNameInput"
 								value={team1Name}
 								onChange={(e) => setTeam1Name(e.target.value)}
-								placeholder="Nombre Equipo 1"
+								placeholder="Equipo 1"
 								maxLength={20}
 							/>
 							<div class="emojiSelector">
@@ -113,7 +113,7 @@ export default function SettingsModal({
 								class="teamNameInput"
 								value={team2Name}
 								onChange={(e) => setTeam2Name(e.target.value)}
-								placeholder="Nombre Equipo 2"
+								placeholder="Equipo 2"
 								maxLength={20}
 							/>
 							<div class="emojiSelector">
@@ -137,7 +137,7 @@ export default function SettingsModal({
 
 				<div class="settingsActions">
 					<button type="button" class="settingsSaveBtn" onClick={handleSave}>
-						Guardar Cambios
+						Guardar
 					</button>
 				</div>
 			</div>

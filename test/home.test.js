@@ -31,7 +31,7 @@ describe('Home', () => {
     fireEvent.click(screen.getByText('+25'));
 
     // Save
-    fireEvent.click(screen.getByText(/Guardar \+25 pts/i));
+    fireEvent.click(screen.getByText(/Anotar \+25 pts/i));
 
     await waitFor(() => {
       expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('25');
@@ -51,7 +51,7 @@ describe('Home', () => {
     fireEvent.click(screen.getByRole('button', { name: '0' }));
 
     // Save
-    fireEvent.click(screen.getByText(/Guardar \+30 pts/i));
+    fireEvent.click(screen.getByText(/Anotar \+30 pts/i));
 
     await waitFor(() => {
       expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('0');
@@ -65,7 +65,7 @@ describe('Home', () => {
     // Add a hand for Ellos (+25)
     fireEvent.click(container.querySelector('#themAddScoreBtn'));
     fireEvent.click(screen.getByText('+25'));
-    fireEvent.click(screen.getByText(/Guardar \+25 pts/i));
+    fireEvent.click(screen.getByText(/Anotar \+25 pts/i));
 
     await waitFor(() => {
       expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('25');
@@ -89,7 +89,7 @@ describe('Home', () => {
     // Add hand 1 (+10 to Ellos)
     fireEvent.click(container.querySelector('#themAddScoreBtn'));
     fireEvent.click(screen.getByText('+10'));
-    fireEvent.click(screen.getByText(/Guardar \+10 pts/i));
+    fireEvent.click(screen.getByText(/Anotar \+10 pts/i));
 
     await waitFor(() => {
       expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('10');
@@ -98,7 +98,7 @@ describe('Home', () => {
     // Add hand 2 (+20 to Nosotros)
     fireEvent.click(container.querySelector('#usAddScoreBtn'));
     fireEvent.click(screen.getByText('+20'));
-    fireEvent.click(screen.getByText(/Guardar \+20 pts/i));
+    fireEvent.click(screen.getByText(/Anotar \+20 pts/i));
 
     await waitFor(() => {
       expect(screen.getByTitle("🐅 Puntaje Total").innerHTML).toMatch('20');
@@ -123,14 +123,14 @@ describe('Home', () => {
     render(<Home />);
     // Open settings
     fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
-    expect(screen.getByText("⚙️ Ajustes del Juego")).toBeTruthy();
+    expect(screen.getByText("⚙️ Ajustes")).toBeTruthy();
 
     // Select 100 pts
     fireEvent.click(screen.getByText("100 pts"));
-    fireEvent.click(screen.getByText("Guardar Cambios"));
+    fireEvent.click(screen.getByText("Guardar"));
 
     await waitFor(() => {
-      expect(screen.queryByText("⚙️ Ajustes del Juego")).toBeNull();
+      expect(screen.queryByText("⚙️ Ajustes")).toBeNull();
     });
   });
 
@@ -140,23 +140,23 @@ describe('Home', () => {
     // Change winScore to 100
     fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
     fireEvent.click(screen.getByText("100 pts"));
-    fireEvent.click(screen.getByText("Guardar Cambios"));
+    fireEvent.click(screen.getByText("Guardar"));
 
     // Add hand of 100 to Ellos
     fireEvent.click(container.querySelector('#themAddScoreBtn'));
     fireEvent.click(screen.getByRole('button', { name: '1' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
-    fireEvent.click(screen.getByText(/Guardar \+100 pts/i));
+    fireEvent.click(screen.getByText(/Anotar \+100 pts/i));
 
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Anuncio de ganador' })).toBeTruthy();
     });
 
     expect(screen.getByText('¡Ellos ganaron!')).toBeTruthy();
-    expect(screen.getByText('Marcador Final')).toBeTruthy();
+    expect(screen.getByText('Marcador final')).toBeTruthy();
     expect(screen.getByText('100 - 0')).toBeTruthy();
-    expect(screen.getByText('Manos Jugadas')).toBeTruthy();
+    expect(screen.getByText('Manos jugadas')).toBeTruthy();
     expect(screen.getByText('+100 pts')).toBeTruthy();
 
     // Dismiss with Escape
@@ -174,14 +174,14 @@ describe('Home', () => {
     // Change winScore to 100
     fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
     fireEvent.click(screen.getByText("100 pts"));
-    fireEvent.click(screen.getByText("Guardar Cambios"));
+    fireEvent.click(screen.getByText("Guardar"));
 
     // Add hand of 100 to Nosotros
     fireEvent.click(container.querySelector('#usAddScoreBtn'));
     fireEvent.click(screen.getByRole('button', { name: '1' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
-    fireEvent.click(screen.getByText(/Guardar \+100 pts/i));
+    fireEvent.click(screen.getByText(/Anotar \+100 pts/i));
 
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Anuncio de ganador' })).toBeTruthy();
@@ -203,14 +203,14 @@ describe('Home', () => {
     // Change winScore to 100
     fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
     fireEvent.click(screen.getByText("100 pts"));
-    fireEvent.click(screen.getByText("Guardar Cambios"));
+    fireEvent.click(screen.getByText("Guardar"));
 
     // Add winning hand
     fireEvent.click(container.querySelector('#themAddScoreBtn'));
     fireEvent.click(screen.getByRole('button', { name: '1' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
-    fireEvent.click(screen.getByText(/Guardar \+100 pts/i));
+    fireEvent.click(screen.getByText(/Anotar \+100 pts/i));
 
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Anuncio de ganador' })).toBeTruthy();
@@ -239,20 +239,20 @@ describe('Home', () => {
     // Change winScore to 100
     fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
     fireEvent.click(screen.getByText("100 pts"));
-    fireEvent.click(screen.getByText("Guardar Cambios"));
+    fireEvent.click(screen.getByText("Guardar"));
 
     // Add winning hand
     fireEvent.click(container.querySelector('#themAddScoreBtn'));
     fireEvent.click(screen.getByRole('button', { name: '1' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
-    fireEvent.click(screen.getByText(/Guardar \+100 pts/i));
+    fireEvent.click(screen.getByText(/Anotar \+100 pts/i));
 
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Anuncio de ganador' })).toBeTruthy();
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /Compartir Resultado/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Compartir/i }));
     expect(shareMock).toHaveBeenCalledWith(
       expect.objectContaining({
         title: expect.stringContaining('Resultado de Dominó'),
@@ -279,24 +279,24 @@ describe('Home', () => {
     // Change winScore to 100
     fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
     fireEvent.click(screen.getByText("100 pts"));
-    fireEvent.click(screen.getByText("Guardar Cambios"));
+    fireEvent.click(screen.getByText("Guardar"));
 
     // Add winning hand
     fireEvent.click(container.querySelector('#themAddScoreBtn'));
     fireEvent.click(screen.getByRole('button', { name: '1' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
-    fireEvent.click(screen.getByText(/Guardar \+100 pts/i));
+    fireEvent.click(screen.getByText(/Anotar \+100 pts/i));
 
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Anuncio de ganador' })).toBeTruthy();
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /Compartir Resultado/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Compartir/i }));
 
     await waitFor(() => {
       expect(writeTextMock).toHaveBeenCalled();
-      expect(screen.getByText('✓ ¡Copiado!')).toBeTruthy();
+      expect(screen.getByText('✓ Copiado')).toBeTruthy();
     });
   });
 
@@ -306,14 +306,14 @@ describe('Home', () => {
     // Change winScore to 100
     fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
     fireEvent.click(screen.getByText("100 pts"));
-    fireEvent.click(screen.getByText("Guardar Cambios"));
+    fireEvent.click(screen.getByText("Guardar"));
 
     // Add winning hand
     fireEvent.click(container.querySelector('#themAddScoreBtn'));
     fireEvent.click(screen.getByRole('button', { name: '1' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
-    fireEvent.click(screen.getByText(/Guardar \+100 pts/i));
+    fireEvent.click(screen.getByText(/Anotar \+100 pts/i));
 
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Anuncio de ganador' })).toBeTruthy();

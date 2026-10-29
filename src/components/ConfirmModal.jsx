@@ -4,8 +4,8 @@ import './ConfirmModal.css';
 
 export default function ConfirmModal({
 	isOpen,
-	title = '¿Confirmar acción?',
-	message = 'Esta acción no se puede deshacer.',
+	title = '¿Confirmar?',
+	message = 'No se puede deshacer.',
 	confirmText = 'Confirmar',
 	cancelText = 'Cancelar',
 	isDanger = false,

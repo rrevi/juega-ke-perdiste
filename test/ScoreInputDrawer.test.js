@@ -36,10 +36,10 @@ describe('ScoreInputDrawer', () => {
 
     // Click preset "+25"
     fireEvent.click(screen.getByText('+25'));
-    expect(screen.getByText('Guardar +25 pts')).toBeTruthy();
+    expect(screen.getByText('Anotar +25 pts')).toBeTruthy();
 
     // Click Save
-    fireEvent.click(screen.getByText('Guardar +25 pts'));
+    fireEvent.click(screen.getByText('Anotar +25 pts'));
     expect(handleSubmit).toHaveBeenCalledWith(25);
     expect(handleClose).toHaveBeenCalled();
   });
@@ -59,15 +59,15 @@ describe('ScoreInputDrawer', () => {
     // Enter digits 4, 5 -> 45
     fireEvent.click(screen.getByRole('button', { name: '4' }));
     fireEvent.click(screen.getByRole('button', { name: '5' }));
-    expect(screen.getByText('Guardar +45 pts')).toBeTruthy();
+    expect(screen.getByText('Anotar +45 pts')).toBeTruthy();
 
     // Click backspace -> 4
     fireEvent.click(screen.getByRole('button', { name: 'Borrar' }));
-    expect(screen.getByText('Guardar +4 pts')).toBeTruthy();
+    expect(screen.getByText('Anotar +4 pts')).toBeTruthy();
 
     // Click clear -> 0
     fireEvent.click(screen.getByRole('button', { name: 'C' }));
-    expect(screen.getByText('Guardar +0 pts').disabled).toBe(true);
+    expect(screen.getByText('Anotar +0 pts').disabled).toBe(true);
   });
 
   test('should show error and disable save when score exceeds max score', () => {
@@ -88,8 +88,8 @@ describe('ScoreInputDrawer', () => {
     fireEvent.click(screen.getByRole('button', { name: '0' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
 
-    expect(screen.getByText(/Máximo permitido: 168 pts/i)).toBeTruthy();
-    expect(screen.getByText('Guardar +200 pts').disabled).toBe(true);
+    expect(screen.getByText(/Máximo: 168 pts/i)).toBeTruthy();
+    expect(screen.getByText('Anotar +200 pts').disabled).toBe(true);
   });
 
   test('should cap at max score when preset overflows and close on ✕', () => {
@@ -113,8 +113,8 @@ describe('ScoreInputDrawer', () => {
 
     // Preset +50 again -> 200 > 168, should cap at 168
     fireEvent.click(screen.getByText('+50'));
-    expect(screen.getByText(/Máximo permitido: 168 pts/i)).toBeTruthy();
-    expect(screen.getByText('Guardar +168 pts')).toBeTruthy();
+    expect(screen.getByText(/Máximo: 168 pts/i)).toBeTruthy();
+    expect(screen.getByText('Anotar +168 pts')).toBeTruthy();
 
     // Click close button
     fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }));
@@ -135,7 +135,7 @@ describe('ScoreInputDrawer', () => {
       />
     );
 
-    const saveBtn = screen.getByText('Guardar +0 pts');
+    const saveBtn = screen.getByText('Anotar +0 pts');
     saveBtn.removeAttribute('disabled');
     fireEvent.click(saveBtn);
     expect(handleSubmit).not.toHaveBeenCalled();
@@ -145,10 +145,10 @@ describe('ScoreInputDrawer', () => {
     fireEvent.click(screen.getByRole('button', { name: '5' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
 
-    const overflowSaveBtn = screen.getByText('Guardar +150 pts');
+    const overflowSaveBtn = screen.getByText('Anotar +150 pts');
     overflowSaveBtn.removeAttribute('disabled');
     fireEvent.click(overflowSaveBtn);
     expect(handleSubmit).not.toHaveBeenCalled();
-    expect(screen.getByText(/Máximo permitido: 100 pts/i)).toBeTruthy();
+    expect(screen.getByText(/Máximo: 100 pts/i)).toBeTruthy();
   });
 });

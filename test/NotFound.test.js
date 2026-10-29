@@ -6,7 +6,7 @@ import NotFound from '../src/pages/_404';
 describe('NotFound', () => {
   test('should render 404 message', () => {
     render(<NotFound />);
-    expect(screen.getByText('404: Not Found')).toBeTruthy();
-    expect(screen.getByText("It's gone :(")).toBeTruthy();
+    expect(screen.getByText('404: No encontrado')).toBeTruthy();
+    expect(screen.getByText('Página no encontrada')).toBeTruthy();
   });
 });

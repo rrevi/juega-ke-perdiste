@@ -104,11 +104,11 @@ export default function ScoreInputDrawer({
 					</div>
 					<span class="displayUnit">pts</span>
 				</div>
-				{error && <div class="drawerErrorMsg">Máximo permitido: {maxScore} pts</div>}
+				{error && <div class="drawerErrorMsg">Máximo: {maxScore} pts</div>}
 
 				{/* Quick Add Presets */}
 				<div class="quickPresetsSection">
-					<span class="quickPresetsLabel">Atajos rápidos:</span>
+					<span class="quickPresetsLabel">Atajos:</span>
 					<div class="quickPresetsGrid">
 						{QUICK_PRESETS.map((pts) => (
 							<button
@@ -153,7 +153,7 @@ export default function ScoreInputDrawer({
 					disabled={numValue <= 0 || numValue > maxScore}
 					onClick={handleSave}
 				>
-					Guardar +{numValue || 0} pts
+					Anotar +{numValue || 0} pts
 				</button>
 			</div>
 		</div>

@@ -24,8 +24,8 @@ describe('ConfirmModal', () => {
       />
     );
 
-    expect(screen.getByText('¿Confirmar acción?')).toBeTruthy();
-    expect(screen.getByText('Esta acción no se puede deshacer.')).toBeTruthy();
+    expect(screen.getByText('¿Confirmar?')).toBeTruthy();
+    expect(screen.getByText('No se puede deshacer.')).toBeTruthy();
     expect(screen.getByText('Confirmar')).toBeTruthy();
     expect(screen.getByText('Cancelar')).toBeTruthy();
 
@@ -61,13 +61,13 @@ describe('SettingsModal', () => {
       />
     );
 
-    expect(screen.getByText('⚙️ Ajustes del Juego')).toBeTruthy();
+    expect(screen.getByText('⚙️ Ajustes')).toBeTruthy();
 
     // Select 150 pts
     fireEvent.click(screen.getByText('150 pts'));
 
     // Save
-    fireEvent.click(screen.getByText('Guardar Cambios'));
+    fireEvent.click(screen.getByText('Guardar'));
     expect(handleSave).toHaveBeenCalledWith(
       expect.objectContaining({
         winScore: 150
@@ -91,21 +91,21 @@ describe('SettingsModal', () => {
     );
 
     // Edit Team 1 Name
-    const team1Input = screen.getByPlaceholderText('Nombre Equipo 1');
+    const team1Input = screen.getByPlaceholderText('Equipo 1');
     fireEvent.change(team1Input, { target: { value: 'Águilas' } });
 
     // Select Team 1 Emoji
     fireEvent.click(screen.getByText('🦁'));
 
     // Edit Team 2 Name
-    const team2Input = screen.getByPlaceholderText('Nombre Equipo 2');
+    const team2Input = screen.getByPlaceholderText('Equipo 2');
     fireEvent.change(team2Input, { target: { value: 'Tigres' } });
 
     // Select Team 2 Emoji
     fireEvent.click(screen.getByText('🐉'));
 
     // Save
-    fireEvent.click(screen.getByText('Guardar Cambios'));
+    fireEvent.click(screen.getByText('Guardar'));
     expect(handleSave).toHaveBeenCalledWith({
       winScore: 200,
       team1: { name: 'Águilas', emoji: '🦁' },
@@ -129,12 +129,12 @@ describe('SettingsModal', () => {
       />
     );
 
-    const team1Input = screen.getByPlaceholderText('Nombre Equipo 1');
+    const team1Input = screen.getByPlaceholderText('Equipo 1');
     fireEvent.change(team1Input, { target: { value: '   ' } });
-    const team2Input = screen.getByPlaceholderText('Nombre Equipo 2');
+    const team2Input = screen.getByPlaceholderText('Equipo 2');
     fireEvent.change(team2Input, { target: { value: '   ' } });
 
-    fireEvent.click(screen.getByText('Guardar Cambios'));
+    fireEvent.click(screen.getByText('Guardar'));
     expect(handleSave).toHaveBeenCalledWith({
       winScore: 200,
       team1: { name: 'Ellos', emoji: '🦅' },

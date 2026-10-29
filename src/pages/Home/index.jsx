@@ -259,52 +259,44 @@ export default function Home() {
 
 	return (
 		<div class="home">
-			{/* Sticky Top Scoreboard */}
-			<div class="stickyScoreboard">
-				<div class="scoreboardTopBar">
-					<button
-						type="button"
-						id="settingsButton"
-						class="scoreboardUtilBtn settingsTriggerBtn"
-						onClick={() => {
-							triggerHaptic('tap');
-							setIsSettingsOpen(true);
-						}}
-						title="Ajustes"
-						aria-label="Ajustes"
-					>
-						<span class="utilIcon" aria-hidden="true">⚙️</span>
-						<span class="utilLabel">Meta: {winScore}</span>
-					</button>
+			{/* Top App Controls (outside score keeping board) */}
+			<div class="topControlsBar">
+				<button
+					type="button"
+					id="settingsButton"
+					class="appControlBtn settingsTriggerBtn"
+					onClick={() => {
+						triggerHaptic('tap');
+						setIsSettingsOpen(true);
+					}}
+					title="Ajustes"
+					aria-label="Ajustes"
+				>
+					<span class="utilIcon" aria-hidden="true">⚙️</span>
+					<span class="utilLabel">Meta: {winScore}</span>
+				</button>
 
-					<button
-						type="button"
-						id="newGameButton"
-						class="scoreboardUtilBtn newGameButton"
-						onClick={newGameButtonClick}
-						title="Nuevo Juego"
-						aria-label="Nuevo Juego"
-					>
-						<span class="utilIcon" aria-hidden="true">&#8635;</span>
-						<span class="utilLabel">Nuevo</span>
-					</button>
-				</div>
+				<button
+					type="button"
+					id="newGameButton"
+					class="appControlBtn newGameButton"
+					onClick={newGameButtonClick}
+					title="Nuevo Juego"
+					aria-label="Nuevo Juego"
+				>
+					<span class="utilIcon" aria-hidden="true">&#8635;</span>
+					<span class="utilLabel">Nuevo</span>
+				</button>
+			</div>
 
-				<div class="scoreboardContainer">
-					<div
-						class={`teamCard themTeamCard clickableTeamCard ${themTotalScore > usTotalScore && themTotalScore > 0 ? 'isLeading' : ''}`}
-						role="button"
-						tabIndex={0}
-						onClick={() => openDrawer('them')}
-						onKeyDown={(e) => e.key === 'Enter' && openDrawer('them')}
-						title={`Tocar para sumar puntos a ${team1.name}`}
-					>
+			{/* Unified Scorecard Board */}
+			<section class="scorecardBoard" aria-label="Tablero de anotaciones">
+				{/* Total Scores Header */}
+				<div class="scorecardTotalsHeader">
+					<div class={`teamTotalDisplay themTotalDisplay ${themTotalScore > usTotalScore && themTotalScore > 0 ? 'isLeading' : ''}`}>
 						<div class="teamHeader">
 							<span class="teamEmoji" role="img" aria-label={team1.name}>{team1.emoji}</span>
 							<span class="teamLabel">{team1.name}</span>
-							{themTotalScore > usTotalScore && themTotalScore > 0 && (
-								<span class="leaderCrown" title="Liderando" aria-label="Liderando">👑</span>
-							)}
 						</div>
 						<div class="teamScore" id="themTotalScore" title="&#x1F985; Puntaje Total" aria-live="polite">
 							{themTotalScore}
@@ -315,31 +307,19 @@ export default function Home() {
 						<div class="scoreDivider">VS</div>
 					</div>
 
-					<div
-						class={`teamCard usTeamCard clickableTeamCard ${usTotalScore > themTotalScore && usTotalScore > 0 ? 'isLeading' : ''}`}
-						role="button"
-						tabIndex={0}
-						onClick={() => openDrawer('us')}
-						onKeyDown={(e) => e.key === 'Enter' && openDrawer('us')}
-						title={`Tocar para sumar puntos a ${team2.name}`}
-					>
+					<div class={`teamTotalDisplay usTotalDisplay ${usTotalScore > themTotalScore && usTotalScore > 0 ? 'isLeading' : ''}`}>
 						<div class="teamHeader">
 							<span class="teamEmoji" role="img" aria-label={team2.name}>{team2.emoji}</span>
 							<span class="teamLabel">{team2.name}</span>
-							{usTotalScore > themTotalScore && usTotalScore > 0 && (
-								<span class="leaderCrown" title="Liderando" aria-label="Liderando">👑</span>
-							)}
 						</div>
 						<div class="teamScore" id="usTotalScore" title="&#x1F405; Puntaje Total" aria-live="polite">
 							{usTotalScore}
 						</div>
 					</div>
 				</div>
-			</div>
 
-			{/* Scrollable Hands History */}
-			<section class="handsSection">
-				<div class="handsContainer">
+				{/* Continuous Hands History List */}
+				<div class="scorecardHandsBody">
 					<table class="gameHands">
 						<caption class="sr-only">Tabla de puntaje de dominó</caption>
 						<tbody>
@@ -347,7 +327,7 @@ export default function Home() {
 								<tr class="emptyHandsRow">
 									<td colSpan={3}>
 										<div class="emptyState">
-											<p>No hay manos jugadas aún.<br />Toca un equipo para sumar puntos.</p>
+											<p>No hay manos jugadas aún.<br />Usa los botones abajo para sumar puntos.</p>
 										</div>
 									</td>
 								</tr>

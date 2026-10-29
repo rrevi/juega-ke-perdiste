@@ -112,4 +112,226 @@ describe('Home', () => {
       expect(screen.getByTitle("🐅 Puntaje Total").innerHTML).toMatch('20');
     });
   });
+
+  test('should reset directly without confirm modal if hands list is already empty', () => {
+    render(<Home />);
+    fireEvent.click(screen.getByText("↻"));
+    expect(screen.queryByText("¿Reiniciar juego?")).toBeNull();
+  });
+
+  test('should open settings modal, update win score, and close', async () => {
+    render(<Home />);
+    // Open settings
+    fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
+    expect(screen.getByText("⚙️ Ajustes del Juego")).toBeTruthy();
+
+    // Select 100 pts
+    fireEvent.click(screen.getByText("100 pts"));
+    fireEvent.click(screen.getByText("Guardar Cambios"));
+
+    await waitFor(() => {
+      expect(screen.queryByText("⚙️ Ajustes del Juego")).toBeNull();
+    });
+  });
+
+  test('should trigger winner banner when Ellos reach winScore, show stats, and dismiss on Escape', async () => {
+    const { container } = render(<Home />);
+
+    // Change winScore to 100
+    fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
+    fireEvent.click(screen.getByText("100 pts"));
+    fireEvent.click(screen.getByText("Guardar Cambios"));
+
+    // Add hand of 100 to Ellos
+    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: '1' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+    fireEvent.click(screen.getByText(/Guardar \+100 pts/i));
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog', { name: 'Anuncio de ganador' })).toBeTruthy();
+    });
+
+    expect(screen.getByText('¡Ellos ganaron!')).toBeTruthy();
+    expect(screen.getByText('Marcador Final')).toBeTruthy();
+    expect(screen.getByText('100 - 0')).toBeTruthy();
+    expect(screen.getByText('Manos Jugadas')).toBeTruthy();
+    expect(screen.getByText('+100 pts')).toBeTruthy();
+
+    // Dismiss with Escape
+    const dialog = screen.getByRole('dialog', { name: 'Anuncio de ganador' });
+    fireEvent.keyDown(dialog, { key: 'Escape' });
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: 'Anuncio de ganador' })).toBeNull();
+    });
+  });
+
+  test('should trigger winner banner when Nosotros win and dismiss on "Continuar"', async () => {
+    const { container } = render(<Home />);
+
+    // Change winScore to 100
+    fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
+    fireEvent.click(screen.getByText("100 pts"));
+    fireEvent.click(screen.getByText("Guardar Cambios"));
+
+    // Add hand of 100 to Nosotros
+    fireEvent.click(container.querySelector('#usAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: '1' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+    fireEvent.click(screen.getByText(/Guardar \+100 pts/i));
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog', { name: 'Anuncio de ganador' })).toBeTruthy();
+    });
+
+    expect(screen.getByText('¡Nosotros ganamos!')).toBeTruthy();
+
+    // Dismiss with "Continuar"
+    fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: 'Anuncio de ganador' })).toBeNull();
+    });
+  });
+
+  test('should reset game from winner banner "Nuevo Juego" button', async () => {
+    const { container } = render(<Home />);
+
+    // Change winScore to 100
+    fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
+    fireEvent.click(screen.getByText("100 pts"));
+    fireEvent.click(screen.getByText("Guardar Cambios"));
+
+    // Add winning hand
+    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: '1' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+    fireEvent.click(screen.getByText(/Guardar \+100 pts/i));
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog', { name: 'Anuncio de ganador' })).toBeTruthy();
+    });
+
+    // Click "Nuevo Juego" inside winner modal
+    fireEvent.click(container.querySelector('.winnerNewGameBtn'));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: 'Anuncio de ganador' })).toBeNull();
+      expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('0');
+      expect(screen.getByTitle("🐅 Puntaje Total").innerHTML).toMatch('0');
+    });
+  });
+
+  test('should share result via navigator.share when supported', async () => {
+    const shareMock = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(global.navigator, 'share', {
+      value: shareMock,
+      configurable: true,
+      writable: true
+    });
+
+    const { container } = render(<Home />);
+
+    // Change winScore to 100
+    fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
+    fireEvent.click(screen.getByText("100 pts"));
+    fireEvent.click(screen.getByText("Guardar Cambios"));
+
+    // Add winning hand
+    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: '1' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+    fireEvent.click(screen.getByText(/Guardar \+100 pts/i));
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog', { name: 'Anuncio de ganador' })).toBeTruthy();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /Compartir Resultado/i }));
+    expect(shareMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: expect.stringContaining('Resultado de Dominó'),
+        text: expect.stringContaining('Ellos ganaron')
+      })
+    );
+  });
+
+  test('should copy result to clipboard when navigator.share is unavailable and show toast', async () => {
+    Object.defineProperty(global.navigator, 'share', {
+      value: undefined,
+      configurable: true,
+      writable: true
+    });
+    const writeTextMock = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(global.navigator, 'clipboard', {
+      value: { writeText: writeTextMock },
+      configurable: true,
+      writable: true
+    });
+
+    const { container } = render(<Home />);
+
+    // Change winScore to 100
+    fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
+    fireEvent.click(screen.getByText("100 pts"));
+    fireEvent.click(screen.getByText("Guardar Cambios"));
+
+    // Add winning hand
+    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: '1' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+    fireEvent.click(screen.getByText(/Guardar \+100 pts/i));
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog', { name: 'Anuncio de ganador' })).toBeTruthy();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /Compartir Resultado/i }));
+
+    await waitFor(() => {
+      expect(writeTextMock).toHaveBeenCalled();
+      expect(screen.getByText('✓ ¡Copiado!')).toBeTruthy();
+    });
+  });
+
+  test('should trap focus with Tab and Shift+Tab in winner modal', async () => {
+    const { container } = render(<Home />);
+
+    // Change winScore to 100
+    fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
+    fireEvent.click(screen.getByText("100 pts"));
+    fireEvent.click(screen.getByText("Guardar Cambios"));
+
+    // Add winning hand
+    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: '1' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+    fireEvent.click(screen.getByText(/Guardar \+100 pts/i));
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog', { name: 'Anuncio de ganador' })).toBeTruthy();
+    });
+
+    const dialog = screen.getByRole('dialog', { name: 'Anuncio de ganador' });
+    const buttons = dialog.querySelectorAll('button');
+    const firstBtn = buttons[0];
+    const lastBtn = buttons[buttons.length - 1];
+
+    // Shift+Tab on first button wraps to last
+    firstBtn.focus();
+    fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(lastBtn);
+
+    // Tab on last button wraps to first
+    lastBtn.focus();
+    fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: false });
+    expect(document.activeElement).toBe(firstBtn);
+  });
 });

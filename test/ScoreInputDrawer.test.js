@@ -43,4 +43,112 @@ describe('ScoreInputDrawer', () => {
     expect(handleSubmit).toHaveBeenCalledWith(25);
     expect(handleClose).toHaveBeenCalled();
   });
+
+  test('should handle backspace and clear buttons', () => {
+    render(
+      <ScoreInputDrawer
+        isOpen={true}
+        team="us"
+        teamName="Nosotros"
+        teamEmoji="🐅"
+        onClose={jest.fn()}
+        onSubmit={jest.fn()}
+      />
+    );
+
+    // Enter digits 4, 5 -> 45
+    fireEvent.click(screen.getByRole('button', { name: '4' }));
+    fireEvent.click(screen.getByRole('button', { name: '5' }));
+    expect(screen.getByText('Guardar +45 pts')).toBeTruthy();
+
+    // Click backspace -> 4
+    fireEvent.click(screen.getByRole('button', { name: 'Borrar' }));
+    expect(screen.getByText('Guardar +4 pts')).toBeTruthy();
+
+    // Click clear -> 0
+    fireEvent.click(screen.getByRole('button', { name: 'C' }));
+    expect(screen.getByText('Guardar +0 pts').disabled).toBe(true);
+  });
+
+  test('should show error and disable save when score exceeds max score', () => {
+    render(
+      <ScoreInputDrawer
+        isOpen={true}
+        team="them"
+        teamName="Ellos"
+        teamEmoji="🦅"
+        maxScore={168}
+        onClose={jest.fn()}
+        onSubmit={jest.fn()}
+      />
+    );
+
+    // Enter 2, 0, 0 -> 200 (> 168)
+    fireEvent.click(screen.getByRole('button', { name: '2' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+
+    expect(screen.getByText(/Máximo permitido: 168 pts/i)).toBeTruthy();
+    expect(screen.getByText('Guardar +200 pts').disabled).toBe(true);
+  });
+
+  test('should cap at max score when preset overflows and close on ✕', () => {
+    const handleClose = jest.fn();
+    render(
+      <ScoreInputDrawer
+        isOpen={true}
+        team="us"
+        teamName="Nosotros"
+        teamEmoji="🐅"
+        maxScore={168}
+        onClose={handleClose}
+        onSubmit={jest.fn()}
+      />
+    );
+
+    // Preset +50 three times (150)
+    fireEvent.click(screen.getByText('+50'));
+    fireEvent.click(screen.getByText('+50'));
+    fireEvent.click(screen.getByText('+50'));
+
+    // Preset +50 again -> 200 > 168, should cap at 168
+    fireEvent.click(screen.getByText('+50'));
+    expect(screen.getByText(/Máximo permitido: 168 pts/i)).toBeTruthy();
+    expect(screen.getByText('Guardar +168 pts')).toBeTruthy();
+
+    // Click close button
+    fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }));
+    expect(handleClose).toHaveBeenCalled();
+  });
+
+  test('should defensively guard against saving zero or overflow if button is clicked', () => {
+    const handleSubmit = jest.fn();
+    render(
+      <ScoreInputDrawer
+        isOpen={true}
+        team="them"
+        teamName="Ellos"
+        teamEmoji="🦅"
+        maxScore={100}
+        onClose={jest.fn()}
+        onSubmit={handleSubmit}
+      />
+    );
+
+    const saveBtn = screen.getByText('Guardar +0 pts');
+    saveBtn.removeAttribute('disabled');
+    fireEvent.click(saveBtn);
+    expect(handleSubmit).not.toHaveBeenCalled();
+
+    // Type 150 (> 100)
+    fireEvent.click(screen.getByRole('button', { name: '1' }));
+    fireEvent.click(screen.getByRole('button', { name: '5' }));
+    fireEvent.click(screen.getByRole('button', { name: '0' }));
+
+    const overflowSaveBtn = screen.getByText('Guardar +150 pts');
+    overflowSaveBtn.removeAttribute('disabled');
+    fireEvent.click(overflowSaveBtn);
+    expect(handleSubmit).not.toHaveBeenCalled();
+    expect(screen.getByText(/Máximo permitido: 100 pts/i)).toBeTruthy();
+  });
 });

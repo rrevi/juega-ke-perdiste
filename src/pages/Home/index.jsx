@@ -347,7 +347,8 @@ export default function Home() {
 			</section>
 
 			{/* Bottom Action Area */}
-			<div class="inputSection">
+			{/* Bottom Action Footer */}
+			<footer class="inputSection">
 				<div class="primaryTouchActions">
 					<button
 						type="button"
@@ -366,7 +367,7 @@ export default function Home() {
 						<span class="btnEmoji">{team2.emoji}</span> + {team2.name}
 					</button>
 				</div>
-			</div>
+			</footer>
 
 			{/* Touch Score Numpad Drawer */}
 			<ScoreInputDrawer

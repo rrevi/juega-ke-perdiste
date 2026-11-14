@@ -99,6 +99,7 @@ export default function Home() {
 	const [undoState, setUndoState] = useState(null);
 
 	const winnerModalRef = useRef(null);
+	const drawerTriggerRef = useRef(null);
 	const handsBodyRef = useRef(null);
 	const prevHandsLengthRef = useRef(hands.length);
 	const undoTimeoutRef = useRef(null);
@@ -132,8 +133,9 @@ export default function Home() {
 		await toggleWakeLock();
 	}, []);
 
-	const openDrawer = useCallback((team) => {
+	const openDrawer = useCallback((team, trigger) => {
 		triggerHaptic('tap');
+		drawerTriggerRef.current = trigger;
 		setDrawerState({ isOpen: true, team });
 	}, []);
 
@@ -455,7 +457,7 @@ export default function Home() {
 						type="button"
 						id="themAddScoreBtn"
 						class="touchScoreBtn themTouchBtn"
-						onClick={() => openDrawer('them')}
+						onClick={(event) => openDrawer('them', event.currentTarget)}
 					>
 						<span class="btnEmoji">{team1.emoji}</span> + {team1.name}
 					</button>
@@ -463,7 +465,7 @@ export default function Home() {
 						type="button"
 						id="usAddScoreBtn"
 						class="touchScoreBtn usTouchBtn"
-						onClick={() => openDrawer('us')}
+						onClick={(event) => openDrawer('us', event.currentTarget)}
 					>
 						<span class="btnEmoji">{team2.emoji}</span> + {team2.name}
 					</button>
@@ -476,6 +478,7 @@ export default function Home() {
 				teamName={drawerState.team === 'them' ? team1.name : team2.name}
 				teamEmoji={drawerState.team === 'them' ? team1.emoji : team2.emoji}
 				maxScore={MAX_HAND_SCORE}
+				returnFocusRef={drawerTriggerRef}
 				onClose={closeDrawer}
 				onSubmit={handleDrawerScore}
 			/>

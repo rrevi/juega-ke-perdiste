@@ -98,7 +98,7 @@ describe('hardware utils', () => {
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       const sentinel = {
         released: false,
-        release: jest.fn().mockRejectedValue(new Error('Release failed')),
+        release: jest.fn().mockRejectedValueOnce(new Error('Release failed')).mockResolvedValue(undefined),
         addEventListener: jest.fn()
       };
       Object.defineProperty(navigator, 'wakeLock', {
@@ -110,6 +110,9 @@ describe('hardware utils', () => {
       await requestWakeLock();
       await releaseWakeLock();
       expect(warnSpy).toHaveBeenCalledWith('Wake Lock release failed:', expect.any(Error));
+      expect(isWakeLockActive()).toBe(true);
+      await releaseWakeLock();
+      expect(isWakeLockActive()).toBe(false);
     });
   });
 
@@ -128,7 +131,12 @@ describe('hardware utils', () => {
       };
 
       Object.defineProperty(navigator, 'wakeLock', {
-        value: { request: jest.fn().mockResolvedValue(sentinel) },
+        value: {
+          request: jest.fn(async () => {
+            sentinel.released = false;
+            return sentinel;
+          })
+        },
         configurable: true,
         writable: true
       });
@@ -182,6 +190,72 @@ describe('hardware utils', () => {
       expect(deactivated).toBe(false);
       expect(isWakeLockActive()).toBe(false);
       expect(releaseMock).toHaveBeenCalled();
+    });
+
+    test('should release a pending lock when toggled off before it is granted', async () => {
+      let resolveRequest;
+      const request = jest.fn(() => new Promise(resolve => { resolveRequest = resolve; }));
+      const sentinel = {
+        released: false,
+        release: jest.fn().mockResolvedValue(undefined),
+        addEventListener: jest.fn()
+      };
+      Object.defineProperty(navigator, 'wakeLock', {
+        value: { request },
+        configurable: true,
+        writable: true
+      });
+      const listener = jest.fn();
+      const unsubscribe = onWakeLockChange(listener);
+
+      const enabling = toggleWakeLock();
+      await Promise.resolve();
+      const overlappingRequest = requestWakeLock();
+      const disabling = toggleWakeLock();
+      resolveRequest(sentinel);
+
+      expect(await Promise.all([enabling, overlappingRequest, disabling])).toEqual([false, false, false]);
+      expect(request).toHaveBeenCalledTimes(1);
+      expect(sentinel.release).toHaveBeenCalledTimes(1);
+      expect(isWakeLockActive()).toBe(false);
+      expect(listener).not.toHaveBeenCalledWith(true);
+      unsubscribe();
+    });
+
+    test('should wait for a release before acquiring a new lock', async () => {
+      let resolveRelease;
+      const firstLock = {
+        released: false,
+        release: jest.fn(() => new Promise(resolve => { resolveRelease = resolve; })),
+        addEventListener: jest.fn()
+      };
+      const secondLock = {
+        released: false,
+        release: jest.fn().mockResolvedValue(undefined),
+        addEventListener: jest.fn()
+      };
+      const request = jest.fn().mockResolvedValueOnce(firstLock).mockResolvedValueOnce(secondLock);
+      Object.defineProperty(navigator, 'wakeLock', {
+        value: { request },
+        configurable: true,
+        writable: true
+      });
+
+      await toggleWakeLock();
+      const disabling = toggleWakeLock();
+      await Promise.resolve();
+      const enabling = toggleWakeLock();
+      expect(request).toHaveBeenCalledTimes(1);
+      resolveRelease();
+      await disabling;
+
+      expect(await enabling).toBe(true);
+      expect(request).toHaveBeenCalledTimes(2);
+      const [, handleOldRelease] = firstLock.addEventListener.mock.calls[0];
+      handleOldRelease();
+      expect(isWakeLockActive()).toBe(true);
+      await releaseWakeLock();
+      expect(secondLock.release).toHaveBeenCalledTimes(1);
     });
   });
 

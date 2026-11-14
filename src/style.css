@@ -86,6 +86,8 @@ body {
 #app {
 	display: flex;
 	flex-direction: column;
+	height: 100vh;
+	height: 100dvh;
 	min-height: 100vh;
 	min-height: 100dvh;
 	width: 100%;
@@ -94,6 +96,7 @@ body {
 header,
 .appHeader {
 	display: flex;
+	flex-shrink: 0;
 	background-color: var(--surface);
 	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 	padding: max(8px, env(safe-area-inset-top)) 16px 8px;

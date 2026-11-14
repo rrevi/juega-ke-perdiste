@@ -4,6 +4,7 @@
 
 let wakeLockSentinel = null;
 let isWakeLockRequested = false;
+let pendingWakeLockUpdate = null;
 const wakeLockListeners = [];
 let lastNotifiedState = null;
 
@@ -30,45 +31,63 @@ function notifyWakeLockChange(active) {
   }
 }
 
+async function updateWakeLock() {
+  if (isWakeLockRequested && !isWakeLockActive()) {
+    try {
+      const sentinel = await navigator.wakeLock.request('screen');
+      wakeLockSentinel = sentinel;
+      sentinel.addEventListener('release', () => {
+        if (wakeLockSentinel === sentinel) {
+          wakeLockSentinel = null;
+          notifyWakeLockChange(false);
+        }
+      });
+    } catch (err) {
+      console.warn('Wake Lock request failed:', err);
+    }
+  }
+
+  // The user may have switched off while the browser was granting the lock.
+  if (!isWakeLockRequested && isWakeLockActive()) {
+    try {
+      await wakeLockSentinel.release();
+      wakeLockSentinel = null;
+    } catch (err) {
+      console.warn('Wake Lock release failed:', err);
+    }
+  }
+
+  const active = isWakeLockActive();
+  notifyWakeLockChange(active);
+  return active;
+}
+
+function queueWakeLockUpdate() {
+  const update = (pendingWakeLockUpdate || Promise.resolve()).then(updateWakeLock);
+  pendingWakeLockUpdate = update;
+  return update.finally(() => {
+    if (pendingWakeLockUpdate === update) pendingWakeLockUpdate = null;
+  });
+}
+
 export async function requestWakeLock() {
   if (!isWakeLockSupported()) return false;
   isWakeLockRequested = true;
-  try {
-    if (!wakeLockSentinel || wakeLockSentinel.released) {
-      wakeLockSentinel = await navigator.wakeLock.request('screen');
-      notifyWakeLockChange(true);
-      wakeLockSentinel.addEventListener('release', () => {
-        wakeLockSentinel = null;
-        notifyWakeLockChange(false);
-      });
-    }
-    return true;
-  } catch (err) {
-    console.warn('Wake Lock request failed:', err);
-    notifyWakeLockChange(false);
-    return false;
-  }
+  return queueWakeLockUpdate();
 }
 
 export async function releaseWakeLock() {
   isWakeLockRequested = false;
-  if (wakeLockSentinel) {
-    try {
-      await wakeLockSentinel.release();
-    } catch (err) {
-      console.warn('Wake Lock release failed:', err);
-    }
-    wakeLockSentinel = null;
-  }
-  notifyWakeLockChange(false);
+  await queueWakeLockUpdate();
 }
 
 export async function toggleWakeLock() {
-  if (isWakeLockActive()) {
+  const enabled = pendingWakeLockUpdate ? isWakeLockRequested : isWakeLockActive();
+  if (enabled) {
     await releaseWakeLock();
-    return false;
+    return isWakeLockActive();
   }
-  return await requestWakeLock();
+  return requestWakeLock();
 }
 
 // Re-acquire wake lock automatically when returning to the tab if active

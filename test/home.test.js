@@ -388,6 +388,26 @@ describe('Home', () => {
     });
   });
 
+  test('should keep keyboard focus in the score drawer and restore it after dismissal', () => {
+    render(<Home />);
+
+    const themButton = screen.getByRole('button', { name: /\+ Ellos/ });
+    const usButton = screen.getByRole('button', { name: /\+ Nosotros/ });
+    themButton.focus();
+    fireEvent.click(usButton);
+    const closeButton = screen.getByRole('button', { name: 'Cerrar' });
+    expect(document.activeElement).toBe(closeButton);
+
+    fireEvent.keyDown(closeButton, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Borrar' }));
+    fireEvent.keyDown(document.activeElement, { key: 'Tab' });
+    expect(document.activeElement).toBe(closeButton);
+
+    fireEvent.keyDown(closeButton, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.activeElement).toBe(usButton);
+  });
+
   test('should toggle screen wake lock from ambient top bar button', async () => {
     Object.defineProperty(navigator, 'wakeLock', {
       value: {

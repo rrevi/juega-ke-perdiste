@@ -6,7 +6,8 @@
 		"dev": "vite",
 		"build": "vite build --base=./",
 		"preview": "vite preview",
-		"test": "jest"
+		"test": "jest",
+		"lint": "eslint ."
 	},
 	"dependencies": {
 		"events": "^3.3.0",

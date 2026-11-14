@@ -22,7 +22,6 @@
 
 /* Light Theme Tile Styling */
 .dominoTileBody {
-	fill: var(--surface);
 	stroke: var(--border);
 	stroke-width: 4.5;
 }

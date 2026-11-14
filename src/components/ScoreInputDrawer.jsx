@@ -1,13 +1,13 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef } from 'preact/hooks';
 import { triggerHaptic } from '../utils/hardware';
+import { useEscapeKey } from '../utils/useEscapeKey';
 import './ScoreInputDrawer.css';
 
 const QUICK_PRESETS = [5, 10, 15, 20, 25, 30, 40, 50];
 
 export default function ScoreInputDrawer({
 	isOpen,
-	team,
 	teamName = 'Equipo',
 	teamEmoji = '',
 	maxScore = 168,
@@ -20,6 +20,8 @@ export default function ScoreInputDrawer({
 	const [isDragging, setIsDragging] = useState(false);
 	const touchStartY = useRef(0);
 	const currentDragY = useRef(0);
+
+	useEscapeKey(isOpen, onClose);
 
 	useEffect(() => {
 		if (isOpen) {
@@ -118,7 +120,7 @@ export default function ScoreInputDrawer({
 	const numValue = parseInt(value, 10) || 0;
 
 	return (
-		<div class="drawerBackdrop" onClick={onClose} role="dialog" aria-modal="true">
+		<div class="drawerBackdrop" onClick={onClose} role="dialog" aria-modal="true" aria-label={`Sumar puntos a ${teamName}`}>
 			<div
 				class="drawerContainer"
 				onClick={(e) => e.stopPropagation()}

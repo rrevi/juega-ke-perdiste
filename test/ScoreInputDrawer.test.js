@@ -191,5 +191,9 @@ describe('ScoreInputDrawer', () => {
     fireEvent.touchStart(handle, { touches: [{ clientY: 100 }] });
     fireEvent.touchMove(handle, { touches: [{ clientY: 80 }] });
     fireEvent.touchEnd(handle);
+
+    // Escape key closes drawer
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(handleClose).toHaveBeenCalledTimes(2);
   });
 });

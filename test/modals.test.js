@@ -144,5 +144,22 @@ describe('SettingsModal', () => {
     // Backdrop click
     fireEvent.click(screen.getByRole('dialog'));
     expect(handleClose).toHaveBeenCalled();
+
+    // Escape key closes modal
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(handleClose).toHaveBeenCalledTimes(3);
+  });
+
+  test('should close ConfirmModal on Escape key', () => {
+    const handleCancel = jest.fn();
+    render(
+      <ConfirmModal
+        isOpen={true}
+        onConfirm={jest.fn()}
+        onCancel={handleCancel}
+      />
+    );
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(handleCancel).toHaveBeenCalledTimes(1);
   });
 });

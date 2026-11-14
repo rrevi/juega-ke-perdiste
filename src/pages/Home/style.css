@@ -23,8 +23,8 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 36px;
-	height: 36px;
+	width: 40px;
+	height: 40px;
 	padding: 0;
 	border-radius: 50%;
 	background-color: var(--surface);
@@ -319,7 +319,7 @@
 	align-items: center;
 	position: relative;
 	width: 100%;
-	padding: 9px 0;
+	padding: 9px 36px;
 	border: 0;
 }
 
@@ -369,7 +369,7 @@
 
 .actionCell {
 	position: absolute;
-	right: 8px;
+	right: 2px;
 	top: 50%;
 	transform: translateY(-50%);
 	z-index: 2;
@@ -387,10 +387,10 @@
 }
 
 .handRow .removeHandButton {
-	width: 28px;
-	height: 28px;
-	min-width: 28px;
-	min-height: 28px;
+	width: 34px;
+	height: 34px;
+	min-width: 34px;
+	min-height: 34px;
 	padding: 0;
 	border-radius: 6px;
 	display: inline-flex;

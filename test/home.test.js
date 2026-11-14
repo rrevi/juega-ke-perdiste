@@ -411,4 +411,66 @@ describe('Home', () => {
       expect(wakeLockBtn).toBeTruthy();
     });
   });
+
+  test('should clear undo snackbar on game reset', async () => {
+    const { container } = render(<Home />);
+
+    // Add 2 hands so deleting 1 leaves hands > 0 to trigger confirm reset
+    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByText('+25'));
+    fireEvent.click(screen.getByText(/Anotar \+25 pts/i));
+
+    fireEvent.click(container.querySelector('#usAddScoreBtn'));
+    fireEvent.click(screen.getByText('+10'));
+    fireEvent.click(screen.getByText(/Anotar \+10 pts/i));
+
+    await waitFor(() => {
+      expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('25');
+    });
+
+    // Delete hand #1 -> undo snackbar appears
+    fireEvent.click(screen.getByRole('button', { name: /Eliminar mano #1/i }));
+    expect(screen.getByText('Mano eliminada')).toBeTruthy();
+
+    // Reset game
+    fireEvent.click(screen.getByText("↻"));
+    fireEvent.click(screen.getByText("Reiniciar"));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Mano eliminada')).toBeNull();
+      expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('0');
+      expect(screen.getByTitle("🐅 Puntaje Total").innerHTML).toMatch('0');
+    });
+  });
+
+  test('should fallback safely on malformed localStorage settings and trigger winner when winScore is lowered', async () => {
+    localStorage.setItem('jkp-win-score', '0');
+    localStorage.setItem('jkp-team1', 'null');
+
+    const { container } = render(<Home />);
+
+    // Default fallback team1 and winScore=200 (not an instant win at 0)
+    expect(screen.queryByRole('dialog', { name: 'Anuncio de ganador' })).toBeNull();
+    expect(screen.getByRole('button', { name: /Ajustes \(Meta: 200\)/i })).toBeTruthy();
+
+    // Add 100 pts to Ellos (still below 200)
+    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByText('+50'));
+    fireEvent.click(screen.getByText('+50'));
+    fireEvent.click(screen.getByText(/Anotar \+100 pts/i));
+
+    await waitFor(() => {
+      expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('100');
+    });
+    expect(screen.queryByRole('dialog', { name: 'Anuncio de ganador' })).toBeNull();
+
+    // Lower winScore to 100 -> winner banner triggers immediately
+    fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
+    fireEvent.click(screen.getByText("100 pts"));
+    fireEvent.click(screen.getByText("Guardar"));
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog', { name: 'Anuncio de ganador' })).toBeTruthy();
+    });
+  });
 });

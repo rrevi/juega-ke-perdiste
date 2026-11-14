@@ -21,7 +21,7 @@ const MAX_HAND_SCORE = 168;
 const CONFETTI_COUNT = 20;
 const CONFETTI_COLORS = ['#18181b', '#ffffff', '#b8860b', '#dc2626', '#e5a93c', '#5a5a64'];
 
-function getWinningTitle(team) {
+function formatWinningAction(team) {
 	const name = team.name.trim();
 	const lower = name.toLowerCase();
 	let verb = 'ganó';
@@ -30,19 +30,28 @@ function getWinningTitle(team) {
 	} else if (lower === 'ellos' || lower === 'ellas' || lower.endsWith('s')) {
 		verb = 'ganaron';
 	}
-	return `¡${name} ${verb}!`;
+	return `${name} ${verb}`;
+}
+
+function getWinningTitle(team) {
+	return `¡${formatWinningAction(team)}!`;
 }
 
 function getShareWinningSentence(team, winnerScore, loserScore) {
-	const name = team.name.trim();
-	const lower = name.toLowerCase();
-	let verb = 'ganó';
-	if (lower === 'nosotros' || lower === 'nosotras') {
-		verb = 'ganamos';
-	} else if (lower === 'ellos' || lower === 'ellas' || lower.endsWith('s')) {
-		verb = 'ganaron';
+	return `🏆 ¡${team.emoji} ${formatWinningAction(team)}! (${winnerScore} a ${loserScore} pts)`;
+}
+
+function loadStoredTeam(key, fallback) {
+	try {
+		const raw = localStorage.getItem(key);
+		const parsed = raw ? JSON.parse(raw) : null;
+		if (parsed && typeof parsed.name === 'string' && typeof parsed.emoji === 'string') {
+			return parsed;
+		}
+	} catch {
+		// ignore malformed storage
 	}
-	return `🏆 ¡${team.emoji} ${name} ${verb}! (${winnerScore} a ${loserScore} pts)`;
+	return fallback;
 }
 
 function generateConfetti() {
@@ -74,29 +83,15 @@ export default function Home() {
 	const [winScore, setWinScore] = useState(() => {
 		try {
 			const s = localStorage.getItem('jkp-win-score');
-			return s ? parseInt(s, 10) : 200;
+			const parsed = s ? parseInt(s, 10) : NaN;
+			return Number.isFinite(parsed) && parsed > 0 ? parsed : WIN_SCORE;
 		} catch {
-			return 200;
+			return WIN_SCORE;
 		}
 	});
 
-	const [team1, setTeam1] = useState(() => {
-		try {
-			const t = localStorage.getItem('jkp-team1');
-			return t ? JSON.parse(t) : { name: 'Ellos', emoji: '🦅' };
-		} catch {
-			return { name: 'Ellos', emoji: '🦅' };
-		}
-	});
-
-	const [team2, setTeam2] = useState(() => {
-		try {
-			const t = localStorage.getItem('jkp-team2');
-			return t ? JSON.parse(t) : { name: 'Nosotros', emoji: '🐅' };
-		} catch {
-			return { name: 'Nosotros', emoji: '🐅' };
-		}
-	});
+	const [team1, setTeam1] = useState(() => loadStoredTeam('jkp-team1', { name: 'Ellos', emoji: '🦅' }));
+	const [team2, setTeam2] = useState(() => loadStoredTeam('jkp-team2', { name: 'Nosotros', emoji: '🐅' }));
 
 	const [isConfirmResetOpen, setIsConfirmResetOpen] = useState(false);
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -107,6 +102,7 @@ export default function Home() {
 	const handsBodyRef = useRef(null);
 	const prevHandsLengthRef = useRef(hands.length);
 	const undoTimeoutRef = useRef(null);
+	const copiedToastTimeoutRef = useRef(null);
 
 	useEffect(() => {
 		const unsubscribe = onWakeLockChange((active) => {
@@ -166,24 +162,44 @@ export default function Home() {
 		}
 	}, []);
 
+	const clearUndo = useCallback(() => {
+		if (undoTimeoutRef.current) {
+			clearTimeout(undoTimeoutRef.current);
+			undoTimeoutRef.current = null;
+		}
+		setUndoState(null);
+	}, []);
+
+	const resetMatch = useCallback(() => {
+		clearUndo();
+		if (copiedToastTimeoutRef.current) {
+			clearTimeout(copiedToastTimeoutRef.current);
+			copiedToastTimeoutRef.current = null;
+		}
+		setCopiedToast(false);
+		model.destroyAll();
+		setWinner(null);
+		setIsConfirmResetOpen(false);
+	}, [clearUndo]);
+
 	useEffect(() => {
 		requestWakeLock();
 		const unsubscribe = model.subscribe(() => {
 			setHands([...model.hands]);
-			const [themTotal, usTotal] = model.totalScores();
-			if (themTotal >= winScore) {
-				setWinner(w => w !== null ? w : 'them');
-			} else if (usTotal >= winScore) {
-				setWinner(w => w !== null ? w : 'us');
-			}
 		});
 
 		return () => {
 			unsubscribe();
 			model.dispose();
 			releaseWakeLock();
+			if (undoTimeoutRef.current) {
+				clearTimeout(undoTimeoutRef.current);
+			}
+			if (copiedToastTimeoutRef.current) {
+				clearTimeout(copiedToastTimeoutRef.current);
+			}
 		};
-	}, [winScore]);
+	}, []);
 
 	useEffect(() => {
 		if (winner) {
@@ -203,20 +219,21 @@ export default function Home() {
 		return [themTotal, usTotal];
 	}, [hands]);
 
-	const themPercent = useMemo(() => {
-		return Math.min(100, Math.round((themTotalScore / winScore) * 100));
-	}, [themTotalScore, winScore]);
-
-	const usPercent = useMemo(() => {
-		return Math.min(100, Math.round((usTotalScore / winScore) * 100));
-	}, [usTotalScore, winScore]);
+	useEffect(() => {
+		if (themTotalScore >= winScore) {
+			setWinner(w => (w !== null ? w : 'them'));
+		} else if (usTotalScore >= winScore) {
+			setWinner(w => (w !== null ? w : 'us'));
+		} else {
+			setWinner(null);
+		}
+	}, [themTotalScore, usTotalScore, winScore]);
 
 	const matchStats = useMemo(() => {
 		const totalRounds = hands.length;
 		const maxHand = totalRounds > 0 ? Math.max(...hands.map(h => Math.max(h.themScore, h.usScore))) : 0;
-		const avgScore = totalRounds > 0 ? Math.round((themTotalScore + usTotalScore) / totalRounds) : 0;
-		return { totalRounds, maxHand, avgScore };
-	}, [hands, themTotalScore, usTotalScore]);
+		return { totalRounds, maxHand };
+	}, [hands]);
 
 	const [copiedToast, setCopiedToast] = useState(false);
 
@@ -224,7 +241,6 @@ export default function Home() {
 		triggerHaptic('tap');
 		const winnerTeam = winner === 'them' ? team1 : team2;
 		const winnerScore = winner === 'them' ? themTotalScore : usTotalScore;
-		const loserTeam = winner === 'them' ? team2 : team1;
 		const loserScore = winner === 'them' ? usTotalScore : themTotalScore;
 
 		const winnerSentence = getShareWinningSentence(winnerTeam, winnerScore, loserScore);
@@ -242,9 +258,15 @@ export default function Home() {
 			}).catch(() => {});
 		} else if (typeof navigator !== 'undefined' && navigator.clipboard) {
 			navigator.clipboard.writeText(shareText).then(() => {
+				if (copiedToastTimeoutRef.current) {
+					clearTimeout(copiedToastTimeoutRef.current);
+				}
 				setCopiedToast(true);
-				setTimeout(() => setCopiedToast(false), 2500);
-			});
+				copiedToastTimeoutRef.current = setTimeout(() => {
+					setCopiedToast(false);
+					copiedToastTimeoutRef.current = null;
+				}, 2500);
+			}).catch(() => {});
 		}
 	}, [winner, team1, team2, themTotalScore, usTotalScore, matchStats, winScore]);
 
@@ -265,34 +287,24 @@ export default function Home() {
 	const undoDeleteHand = useCallback(() => {
 		if (!undoState) return;
 		triggerHaptic('success');
-		if (undoTimeoutRef.current) {
-			clearTimeout(undoTimeoutRef.current);
-			undoTimeoutRef.current = null;
-		}
+		const { hand, index } = undoState;
+		clearUndo();
 		const restored = [...model.hands];
-		const targetIndex = typeof undoState.index === 'number' ? Math.min(undoState.index, restored.length) : restored.length;
-		restored.splice(targetIndex, 0, undoState.hand);
+		const targetIndex = typeof index === 'number' ? Math.min(index, restored.length) : restored.length;
+		restored.splice(targetIndex, 0, hand);
 		model.hands = restored;
 		model.persist();
 		model.inform();
-		setUndoState(null);
-	}, [undoState]);
+	}, [undoState, clearUndo]);
 
 	const newGameButtonClick = useCallback(() => {
 		triggerHaptic('tap');
 		if (hands.length > 0) {
 			setIsConfirmResetOpen(true);
 		} else {
-			model.destroyAll();
-			setWinner(null);
+			resetMatch();
 		}
-	}, [hands.length]);
-
-	const handleConfirmReset = useCallback(() => {
-		model.destroyAll();
-		setWinner(null);
-		setIsConfirmResetOpen(false);
-	}, []);
+	}, [hands.length, resetMatch]);
 
 	const dismissWinner = useCallback(() => {
 		setWinner(null);
@@ -461,7 +473,6 @@ export default function Home() {
 			{/* Touch Score Numpad Drawer */}
 			<ScoreInputDrawer
 				isOpen={drawerState.isOpen}
-				team={drawerState.team}
 				teamName={drawerState.team === 'them' ? team1.name : team2.name}
 				teamEmoji={drawerState.team === 'them' ? team1.emoji : team2.emoji}
 				maxScore={MAX_HAND_SCORE}
@@ -477,7 +488,7 @@ export default function Home() {
 				confirmText="Reiniciar"
 				cancelText="Cancelar"
 				isDanger={true}
-				onConfirm={handleConfirmReset}
+				onConfirm={resetMatch}
 				onCancel={() => setIsConfirmResetOpen(false)}
 			/>
 
@@ -543,10 +554,7 @@ export default function Home() {
 							{copiedToast ? '✓ Copiado' : '📤 Compartir'}
 						</button>
 						<button type="button" onClick={dismissWinner}>Continuar</button>
-						<button type="button" class="winnerNewGameBtn" onClick={() => {
-							dismissWinner();
-							model.destroyAll();
-						}}>Nuevo juego</button>
+						<button type="button" class="winnerNewGameBtn" onClick={resetMatch}>Nuevo juego</button>
 					</div>
 				</div>
 			)}

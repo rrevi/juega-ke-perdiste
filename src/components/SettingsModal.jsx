@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { triggerHaptic } from '../utils/hardware';
+import { useEscapeKey } from '../utils/useEscapeKey';
 import './SettingsModal.css';
 
 const WIN_SCORE_OPTIONS = [100, 150, 200, 250, 500];
@@ -31,6 +32,8 @@ export default function SettingsModal({
 		}
 	}, [isOpen, currentWinScore, team1, team2]);
 
+	useEscapeKey(isOpen, onClose);
+
 	if (!isOpen) return null;
 
 	const handleSave = () => {
@@ -44,7 +47,7 @@ export default function SettingsModal({
 	};
 
 	return (
-		<div class="settingsBackdrop" onClick={onClose} role="dialog" aria-modal="true">
+		<div class="settingsBackdrop" onClick={onClose} role="dialog" aria-modal="true" aria-label="Ajustes">
 			<div class="settingsContainer" onClick={(e) => e.stopPropagation()}>
 				<div class="settingsHeader">
 					<h3 class="settingsTitle">⚙️ Ajustes</h3>

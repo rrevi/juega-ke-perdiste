@@ -33,16 +33,11 @@ export default function ScoreInputDrawer({
 	const currentDragY = useRef(0);
 	const closeButtonRef = useRef(null);
 
-	const { dialogRef, handleBackdropClick } = useDialog(isOpen, onClose);
+	const { dialogRef, handleBackdropClick } = useDialog(isOpen, onClose, returnFocusRef);
 
 	useLayoutEffect(() => {
-		if (!isOpen) return;
-		const trigger = returnFocusRef?.current ?? document.activeElement;
-		closeButtonRef.current.focus({ preventScroll: true });
-		return () => {
-			if (trigger instanceof HTMLElement && trigger.isConnected) trigger.focus({ preventScroll: true });
-		};
-	}, [isOpen, returnFocusRef]);
+		if (isOpen) closeButtonRef.current.focus({ preventScroll: true });
+	}, [isOpen]);
 
 	useEffect(() => {
 		if (isOpen) {
@@ -167,10 +162,10 @@ export default function ScoreInputDrawer({
 				class="drawerContainer"
 				onClick={(e) => e.stopPropagation()}
 				onKeyDown={handleKeyDown}
-				style={{
-					transform: dragY ? `translateY(${Math.max(0, dragY)}px)` : undefined,
+				style={isDragging || dragY !== 0 ? {
+					transform: `translateY(${Math.max(0, dragY)}px)`,
 					transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
-				}}
+				} : undefined}
 			>
 				<div
 					class="drawerDragHandleArea"

@@ -9,10 +9,11 @@ export default function ConfirmModal({
 	confirmText = 'Confirmar',
 	cancelText = 'Cancelar',
 	isDanger = false,
+	returnFocusRef = undefined,
 	onConfirm,
 	onCancel
 }) {
-	const { dialogRef, handleBackdropClick } = useDialog(isOpen, onCancel);
+	const { dialogRef, handleBackdropClick } = useDialog(isOpen, onCancel, returnFocusRef);
 
 	if (!isOpen) return null;
 

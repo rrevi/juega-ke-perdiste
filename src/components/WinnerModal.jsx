@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
+import { useMemo, useEffect, useRef, useCallback } from 'preact/hooks';
 import { getWinningTitle } from '../utils/dominoText';
 import { triggerHaptic } from '../utils/hardware';
 
@@ -46,13 +46,12 @@ export default function WinnerModal({
 	onDismiss,
 	onNewGame
 }) {
-	const [confetti, setConfetti] = useState(/** @type {ReturnType<typeof generateConfetti>} */ ([]));
+	const confetti = useMemo(() => (winner ? generateConfetti() : []), [winner]);
 	const modalRef = useRef(/** @type {HTMLDivElement | null} */ (null));
 
 	useEffect(() => {
 		if (winner) {
 			triggerHaptic('win');
-			setConfetti(generateConfetti());
 			modalRef.current?.focus();
 		}
 	}, [winner]);

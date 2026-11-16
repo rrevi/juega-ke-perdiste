@@ -4,8 +4,9 @@ import { useEffect, useLayoutEffect, useRef } from 'preact/hooks';
  * Syncs a native <dialog> element with an open flag and handles Escape / backdrop close.
  * @param {boolean} isOpen
  * @param {() => void} onClose
+ * @param {import('preact').RefObject<HTMLElement | null>} [returnFocusRef]
  */
-export function useDialog(isOpen, onClose) {
+export function useDialog(isOpen, onClose, returnFocusRef) {
 	/** @type {import('preact').RefObject<HTMLDialogElement>} */
 	const dialogRef = useRef(null);
 	const onCloseRef = useRef(onClose);
@@ -13,20 +14,26 @@ export function useDialog(isOpen, onClose) {
 
 	useLayoutEffect(() => {
 		const dialog = dialogRef.current;
-		if (!dialog) return;
+		if (!isOpen || !dialog) return;
 
-		if (isOpen) {
-			if (typeof dialog.showModal === 'function') {
-				if (!dialog.open) dialog.showModal();
-			} else {
-				dialog.setAttribute('open', '');
-			}
-		} else if (typeof dialog.close === 'function') {
-			if (dialog.open) dialog.close();
+		const trigger = returnFocusRef?.current ?? document.activeElement;
+		if (typeof dialog.showModal === 'function') {
+			dialog.showModal();
 		} else {
-			dialog.removeAttribute('open');
+			dialog.setAttribute('open', '');
 		}
-	}, [isOpen]);
+
+		return () => {
+			if (typeof dialog.close === 'function') {
+				dialog.close();
+			} else {
+				dialog.removeAttribute('open');
+			}
+			if (trigger instanceof HTMLElement && trigger.isConnected) {
+				trigger.focus({ preventScroll: true });
+			}
+		};
+	}, [isOpen, returnFocusRef]);
 
 	useEffect(() => {
 		if (!isOpen || typeof document === 'undefined') return undefined;

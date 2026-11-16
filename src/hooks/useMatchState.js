@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'preact/hooks';
+import { useLayoutEffect, useRef, useCallback } from 'preact/hooks';
 import { useSignal, useComputed, useSignalEffect, batch } from '@preact/signals';
 import HandModel from '../models/HandModel';
 import { getShareWinningSentence } from '../utils/dominoText';
@@ -7,6 +7,7 @@ import {
 	releaseWakeLock,
 	toggleWakeLock,
 	isWakeLockActive,
+	isWakeLockSupported,
 	onWakeLockChange,
 	triggerHaptic
 } from '../utils/hardware';
@@ -22,7 +23,6 @@ const DEFAULT_TEAM_2 = { name: 'Nosotros', emoji: '🐅' };
  * @returns {T}
  */
 function loadStoredTeam(key, fallback) {
-	if (typeof window === 'undefined' || typeof localStorage === 'undefined') return fallback;
 	try {
 		const raw = localStorage.getItem(key);
 		const parsed = raw ? JSON.parse(raw) : null;
@@ -36,7 +36,6 @@ function loadStoredTeam(key, fallback) {
 }
 
 function loadStoredWinScore() {
-	if (typeof window === 'undefined' || typeof localStorage === 'undefined') return DEFAULT_WIN_SCORE;
 	try {
 		const raw = localStorage.getItem('jkp-win-score');
 		const parsed = raw ? parseInt(raw, 10) : NaN;
@@ -51,17 +50,15 @@ function loadStoredWinScore() {
  */
 export function useMatchState() {
 	const modelRef = useRef(/** @type {HandModel | null} */ (null));
-	if (!modelRef.current) {
-		modelRef.current = new HandModel('jkp-hands');
-	}
-	const model = modelRef.current;
 
-	const hands = useSignal(model.hands);
-	const winScore = useSignal(loadStoredWinScore());
-	const team1 = useSignal(loadStoredTeam('jkp-team1', DEFAULT_TEAM_1));
-	const team2 = useSignal(loadStoredTeam('jkp-team2', DEFAULT_TEAM_2));
+	// The prerender and first client render share these defaults.
+	const hands = useSignal(/** @type {HandModel['hands']} */ ([]));
+	const winScore = useSignal(DEFAULT_WIN_SCORE);
+	const team1 = useSignal(DEFAULT_TEAM_1);
+	const team2 = useSignal(DEFAULT_TEAM_2);
 	const winner = useSignal(/** @type {'them' | 'us' | null} */ (null));
-	const wakeLockActive = useSignal(isWakeLockActive());
+	const wakeLockAvailable = useSignal(false);
+	const wakeLockActive = useSignal(false);
 	const undoState = useSignal(/** @type {{ hand: any, index: number } | null} */ (null));
 	const copiedToast = useSignal(false);
 
@@ -99,10 +96,21 @@ export function useMatchState() {
 			copiedToast.value = false;
 			winner.value = null;
 		});
-		model.destroyAll();
-	}, [clearUndo, copiedToast, winner, model]);
+		modelRef.current.destroyAll();
+	}, [clearUndo, copiedToast, winner]);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
+		const model = new HandModel('jkp-hands');
+		modelRef.current = model;
+		batch(() => {
+			hands.value = [...model.hands];
+			winScore.value = loadStoredWinScore();
+			team1.value = loadStoredTeam('jkp-team1', DEFAULT_TEAM_1);
+			team2.value = loadStoredTeam('jkp-team2', DEFAULT_TEAM_2);
+			wakeLockAvailable.value = isWakeLockSupported();
+			wakeLockActive.value = isWakeLockActive();
+		});
+
 		const unsubscribeWakeLock = onWakeLockChange((active) => {
 			wakeLockActive.value = active;
 		});
@@ -123,7 +131,7 @@ export function useMatchState() {
 				clearTimeout(copiedToastTimeoutRef.current);
 			}
 		};
-	}, [model, hands, wakeLockActive]);
+	}, [hands, winScore, team1, team2, wakeLockAvailable, wakeLockActive]);
 
 	useSignalEffect(() => {
 		const target = winScore.value;
@@ -141,31 +149,32 @@ export function useMatchState() {
 
 	const addHand = useCallback((team, score) => {
 		if (team === 'them') {
-			model.add(score, 0);
+			modelRef.current.add(score, 0);
 		} else {
-			model.add(0, score);
+			modelRef.current.add(0, score);
 		}
-	}, [model]);
+	}, []);
 
 	const removeHand = useCallback((hand, index) => {
 		triggerHaptic('remove');
 		if (undoTimeoutRef.current) {
 			clearTimeout(undoTimeoutRef.current);
 		}
-		model.destroy(hand);
+		modelRef.current.destroy(hand);
 		undoState.value = { hand, index };
 
 		undoTimeoutRef.current = setTimeout(() => {
 			undoState.value = null;
 			undoTimeoutRef.current = null;
 		}, 5000);
-	}, [model, undoState]);
+	}, [undoState]);
 
 	const undoDeleteHand = useCallback(() => {
 		const pending = undoState.value;
 		if (!pending) return;
 		triggerHaptic('success');
 		clearUndo();
+		const model = modelRef.current;
 		const restored = [...model.hands];
 		const targetIndex = typeof pending.index === 'number'
 			? Math.min(pending.index, restored.length)
@@ -174,7 +183,7 @@ export function useMatchState() {
 		model.hands = restored;
 		model.persist();
 		model.inform();
-	}, [undoState, clearUndo, model]);
+	}, [undoState, clearUndo]);
 
 	const saveSettings = useCallback((newSettings) => {
 		batch(() => {
@@ -241,6 +250,7 @@ export function useMatchState() {
 		team1,
 		team2,
 		winner,
+		wakeLockAvailable,
 		wakeLockActive,
 		undoState,
 		copiedToast,

@@ -12,6 +12,7 @@ export default function SettingsModal({
 	currentWinScore = 200,
 	team1 = { name: 'Ellos', emoji: '🦅' },
 	team2 = { name: 'Nosotros', emoji: '🐅' },
+	returnFocusRef = undefined,
 	onClose,
 	onSave
 }) {
@@ -31,7 +32,7 @@ export default function SettingsModal({
 		}
 	}, [isOpen, currentWinScore, team1, team2]);
 
-	const { dialogRef, handleBackdropClick } = useDialog(isOpen, onClose);
+	const { dialogRef, handleBackdropClick } = useDialog(isOpen, onClose, returnFocusRef);
 
 	if (!isOpen) return null;
 

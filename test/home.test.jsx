@@ -1,5 +1,6 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent, screen, waitFor } from '@testing-library/preact';
+import renderToString from 'preact-render-to-string';
 
 import Home from '../src/pages/Home';
 
@@ -17,6 +18,65 @@ describe('Home', () => {
 
     expect(screen.getByTitle("🦅 Puntaje Total").innerHTML).toMatch('0');
     expect(screen.getByTitle("🐅 Puntaje Total").innerHTML).toMatch('0');
+  });
+
+  test('should hydrate the prerender before applying saved scores and browser capabilities', async () => {
+    const container = document.body.appendChild(document.createElement('div'));
+    container.innerHTML = renderToString(<Home />);
+
+    localStorage.setItem('jkp-hands', JSON.stringify([{ _id: 'saved', themScore: 25, usScore: 0 }]));
+    localStorage.setItem('jkp-win-score', '150');
+    localStorage.setItem('jkp-team1', JSON.stringify({ name: 'Águilas', emoji: '🦁' }));
+    const wakeLock = {
+      request: vi.fn().mockResolvedValue({
+        released: false,
+        release: vi.fn().mockResolvedValue(undefined),
+        addEventListener: vi.fn()
+      })
+    };
+    Object.defineProperty(navigator, 'wakeLock', { configurable: true, value: wakeLock });
+
+    try {
+      const options = { container, hydrate: true };
+      render(<Home />, options);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Ajustes (Meta: 150)' })).toBeTruthy();
+        expect(screen.getByRole('img', { name: 'Águilas' })).toBeTruthy();
+        expect(container.querySelector('#wakeLockButton')).toBeTruthy();
+        expect(container.querySelectorAll('#newGameButton')).toHaveLength(1);
+        expect(container.querySelector('.handRow td').getAttribute('colspan')).toBeNull();
+        expect(container.querySelector('.handRow td').textContent).toBe('25');
+        expect(container.querySelector('.emptyHandsRow')).toBeNull();
+      });
+    } finally {
+      Reflect.deleteProperty(navigator, 'wakeLock');
+    }
+  });
+
+  test('should allow scoring and undo when site storage is denied', () => {
+    const storage = vi.spyOn(window, 'localStorage', 'get').mockImplementation(() => {
+      throw new DOMException('Site storage is disabled', 'SecurityError');
+    });
+
+    try {
+      render(<Home />);
+      expect(screen.getByRole('button', { name: 'Ajustes (Meta: 200)' })).toBeTruthy();
+      fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/ }));
+      fireEvent.click(screen.getByRole('button', { name: '+25' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Anotar +25 pts' }));
+      expect(screen.getByTitle('🦅 Puntaje Total').textContent).toBe('25');
+
+      fireEvent.click(screen.getByRole('button', { name: /Eliminar mano #1/ }));
+      expect(screen.getByTitle('🦅 Puntaje Total').textContent).toBe('0');
+      fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }));
+      expect(screen.getByTitle('🦅 Puntaje Total').textContent).toBe('25');
+      fireEvent.click(screen.getByRole('button', { name: 'Nuevo juego' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Reiniciar' }));
+      expect(screen.getByTitle('🦅 Puntaje Total').textContent).toBe('0');
+    } finally {
+      storage.mockRestore();
+    }
   });
 
   test('should add 🦅 hand via drawer and preset', async () => {
@@ -405,6 +465,27 @@ describe('Home', () => {
     fireEvent.keyDown(closeButton, { key: 'Escape' });
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(document.activeElement).toBe(usButton);
+  });
+
+  test('should return focus to the trigger after dismissing settings and reset confirmation', () => {
+    localStorage.setItem('jkp-hands', JSON.stringify([{ _id: 'saved', themScore: 25, usScore: 0 }]));
+    render(<Home />);
+
+    const settings = screen.getByRole('button', { name: /Ajustes/ });
+    fireEvent.click(settings);
+    const close = screen.getByRole('button', { name: 'Cerrar' });
+    close.focus();
+    fireEvent.keyDown(close, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.activeElement).toBe(settings);
+
+    const reset = screen.getByRole('button', { name: 'Nuevo juego' });
+    fireEvent.click(reset);
+    const cancel = screen.getByRole('button', { name: 'Cancelar' });
+    cancel.focus();
+    fireEvent.click(cancel);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.activeElement).toBe(reset);
   });
 
   test('should toggle screen wake lock from ambient top bar button', async () => {

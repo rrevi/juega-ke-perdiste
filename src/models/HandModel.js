@@ -53,8 +53,10 @@ export default class HandModel {
   }
 
   persist() {
-    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    try {
       localStorage.setItem(this.dbName, JSON.stringify(this.hands));
+    } catch {
+      // Keep the current game playable when storage is unavailable.
     }
   }
 

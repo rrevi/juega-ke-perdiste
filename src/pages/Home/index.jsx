@@ -5,7 +5,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 import SettingsModal from '../../components/SettingsModal';
 import WinnerModal from '../../components/WinnerModal';
 import { useMatchState } from '../../hooks/useMatchState';
-import { isWakeLockSupported, triggerHaptic } from '../../utils/hardware';
+import { triggerHaptic } from '../../utils/hardware';
 import './style.css';
 
 const MAX_HAND_SCORE = 168;
@@ -18,6 +18,7 @@ export default function Home(_props) {
 		team1,
 		team2,
 		winner,
+		wakeLockAvailable,
 		wakeLockActive,
 		undoState,
 		copiedToast,
@@ -39,6 +40,8 @@ export default function Home(_props) {
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
 	const drawerTriggerRef = useRef(/** @type {HTMLElement | null} */ (null));
+	const settingsTriggerRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
+	const resetTriggerRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
 	const handsBodyRef = useRef(/** @type {HTMLDivElement | null} */ (null));
 	const prevHandsLengthRef = useRef(hands.value.length);
 
@@ -89,6 +92,7 @@ export default function Home(_props) {
 				<button
 					type="button"
 					id="settingsButton"
+					ref={settingsTriggerRef}
 					class="appControlBtn settingsTriggerBtn"
 					onClick={() => {
 						triggerHaptic('tap');
@@ -100,7 +104,7 @@ export default function Home(_props) {
 					<span class="utilIcon" aria-hidden="true">⚙️</span>
 				</button>
 
-				{isWakeLockSupported() && (
+				{wakeLockAvailable.value && (
 					<button
 						type="button"
 						id="wakeLockButton"
@@ -116,6 +120,7 @@ export default function Home(_props) {
 				<button
 					type="button"
 					id="newGameButton"
+					ref={resetTriggerRef}
 					class="appControlBtn newGameButton"
 					onClick={newGameButtonClick}
 					title="Nuevo juego"
@@ -236,6 +241,7 @@ export default function Home(_props) {
 				confirmText="Reiniciar"
 				cancelText="Cancelar"
 				isDanger={true}
+				returnFocusRef={resetTriggerRef}
 				onConfirm={handleConfirmReset}
 				onCancel={() => setIsConfirmResetOpen(false)}
 			/>
@@ -246,6 +252,7 @@ export default function Home(_props) {
 				currentWinScore={winScore.value}
 				team1={team1.value}
 				team2={team2.value}
+				returnFocusRef={settingsTriggerRef}
 				onClose={() => setIsSettingsOpen(false)}
 				onSave={saveSettings}
 			/>

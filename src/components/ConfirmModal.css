@@ -1,4 +1,8 @@
-.modalBackdrop {
+.modalBackdrop:not([open]) {
+	display: none;
+}
+
+.modalBackdrop[open] {
 	position: fixed;
 	inset: 0;
 	width: 100%;
@@ -14,7 +18,7 @@
 	justify-content: center;
 	z-index: 1100;
 	padding: 16px;
-	animation: fadeIn 0.2s ease;
+	animation: fadeIn 0.16s ease-out;
 }
 
 .modalBackdrop::backdrop {
@@ -29,8 +33,18 @@
 	padding: 22px 20px;
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 	border: 1px solid var(--border);
-	animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 	text-align: center;
+}
+
+.modalBackdrop[open] .modalContainer {
+	animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.modalBackdrop[open],
+	.modalBackdrop[open] .modalContainer {
+		animation: none;
+	}
 }
 
 .modalTitle {

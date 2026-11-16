@@ -8,7 +8,9 @@ export default class HandModel {
 
   draw() {
     try {
-      const stored = localStorage.getItem(this.dbName);
+      const stored = typeof window !== 'undefined' && typeof localStorage !== 'undefined'
+        ? localStorage.getItem(this.dbName)
+        : null;
       this.hands = stored ? JSON.parse(stored) : [];
     } catch {
       this.hands = [];
@@ -51,7 +53,9 @@ export default class HandModel {
   }
 
   persist() {
-    localStorage.setItem(this.dbName, JSON.stringify(this.hands));
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      localStorage.setItem(this.dbName, JSON.stringify(this.hands));
+    }
   }
 
   dispose() {

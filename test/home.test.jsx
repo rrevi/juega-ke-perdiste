@@ -1,5 +1,4 @@
-import { expect } from 'expect';
-import { h } from 'preact';
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent, screen, waitFor } from '@testing-library/preact';
 
 import Home from '../src/pages/Home';
@@ -24,7 +23,7 @@ describe('Home', () => {
     const { container } = render(<Home />);
 
     // Click "+ Ellos" button to open score drawer
-    const themBtn = container.querySelector('#themAddScoreBtn');
+    const themBtn = screen.getByRole('button', { name: /\+ Ellos/i });
     fireEvent.click(themBtn);
 
     // Select preset "+25"
@@ -43,7 +42,7 @@ describe('Home', () => {
     const { container } = render(<Home />);
 
     // Click "+ Nosotros" button to open score drawer
-    const usBtn = container.querySelector('#usAddScoreBtn');
+    const usBtn = screen.getByRole('button', { name: /\+ Nosotros/i });
     fireEvent.click(usBtn);
 
     // Enter digits 3, 0 -> 30 pts
@@ -63,7 +62,7 @@ describe('Home', () => {
     const { container } = render(<Home />);
 
     // Add a hand for Ellos (+25)
-    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
     fireEvent.click(screen.getByText('+25'));
     fireEvent.click(screen.getByText(/Anotar \+25 pts/i));
 
@@ -87,7 +86,7 @@ describe('Home', () => {
     const { container } = render(<Home />);
 
     // Add hand 1 (+10 to Ellos)
-    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
     fireEvent.click(screen.getByText('+10'));
     fireEvent.click(screen.getByText(/Anotar \+10 pts/i));
 
@@ -96,7 +95,7 @@ describe('Home', () => {
     });
 
     // Add hand 2 (+20 to Nosotros)
-    fireEvent.click(container.querySelector('#usAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Nosotros/i }));
     fireEvent.click(screen.getByText('+20'));
     fireEvent.click(screen.getByText(/Anotar \+20 pts/i));
 
@@ -117,12 +116,12 @@ describe('Home', () => {
     const { container } = render(<Home />);
 
     // Add hand 1 (+10 to Ellos)
-    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
     fireEvent.click(screen.getByText('+10'));
     fireEvent.click(screen.getByText(/Anotar \+10 pts/i));
 
     // Add hand 2 (+20 to Nosotros)
-    fireEvent.click(container.querySelector('#usAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Nosotros/i }));
     fireEvent.click(screen.getByText('+20'));
     fireEvent.click(screen.getByText(/Anotar \+20 pts/i));
 
@@ -168,7 +167,7 @@ describe('Home', () => {
     fireEvent.click(screen.getByText("Guardar"));
 
     // Add hand of 100 to Ellos
-    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
     fireEvent.click(screen.getByRole('button', { name: '1' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
@@ -202,7 +201,7 @@ describe('Home', () => {
     fireEvent.click(screen.getByText("Guardar"));
 
     // Add hand of 100 to Nosotros
-    fireEvent.click(container.querySelector('#usAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Nosotros/i }));
     fireEvent.click(screen.getByRole('button', { name: '1' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
@@ -231,7 +230,7 @@ describe('Home', () => {
     fireEvent.click(screen.getByText("Guardar"));
 
     // Add winning hand
-    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
     fireEvent.click(screen.getByRole('button', { name: '1' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
@@ -242,7 +241,7 @@ describe('Home', () => {
     });
 
     // Click "Nuevo Juego" inside winner modal
-    fireEvent.click(container.querySelector('.winnerNewGameBtn'));
+    fireEvent.click(/** @type {HTMLElement} */ (container.querySelector('.winnerNewGameBtn')));
 
     await waitFor(() => {
       expect(screen.queryByRole('dialog', { name: 'Anuncio de ganador' })).toBeNull();
@@ -252,8 +251,8 @@ describe('Home', () => {
   });
 
   test('should share result via navigator.share when supported', async () => {
-    const shareMock = jest.fn().mockResolvedValue(undefined);
-    Object.defineProperty(global.navigator, 'share', {
+    const shareMock = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(globalThis.navigator, 'share', {
       value: shareMock,
       configurable: true,
       writable: true
@@ -267,7 +266,7 @@ describe('Home', () => {
     fireEvent.click(screen.getByText("Guardar"));
 
     // Add winning hand
-    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
     fireEvent.click(screen.getByRole('button', { name: '1' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
@@ -287,13 +286,13 @@ describe('Home', () => {
   });
 
   test('should copy result to clipboard when navigator.share is unavailable and show toast', async () => {
-    Object.defineProperty(global.navigator, 'share', {
+    Object.defineProperty(globalThis.navigator, 'share', {
       value: undefined,
       configurable: true,
       writable: true
     });
-    const writeTextMock = jest.fn().mockResolvedValue(undefined);
-    Object.defineProperty(global.navigator, 'clipboard', {
+    const writeTextMock = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(globalThis.navigator, 'clipboard', {
       value: { writeText: writeTextMock },
       configurable: true,
       writable: true
@@ -307,7 +306,7 @@ describe('Home', () => {
     fireEvent.click(screen.getByText("Guardar"));
 
     // Add winning hand
-    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
     fireEvent.click(screen.getByRole('button', { name: '1' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
@@ -334,7 +333,7 @@ describe('Home', () => {
     fireEvent.click(screen.getByText("Guardar"));
 
     // Add winning hand
-    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
     fireEvent.click(screen.getByRole('button', { name: '1' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
     fireEvent.click(screen.getByRole('button', { name: '0' }));
@@ -364,7 +363,7 @@ describe('Home', () => {
     const { container } = render(<Home />);
 
     // Add hand (+25 to Ellos)
-    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
     fireEvent.click(screen.getByText('+25'));
     fireEvent.click(screen.getByText(/Anotar \+25 pts/i));
 
@@ -400,7 +399,7 @@ describe('Home', () => {
 
     fireEvent.keyDown(closeButton, { key: 'Tab', shiftKey: true });
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Borrar' }));
-    fireEvent.keyDown(document.activeElement, { key: 'Tab' });
+    fireEvent.keyDown(/** @type {Element} */ (document.activeElement), { key: 'Tab' });
     expect(document.activeElement).toBe(closeButton);
 
     fireEvent.keyDown(closeButton, { key: 'Escape' });
@@ -411,10 +410,10 @@ describe('Home', () => {
   test('should toggle screen wake lock from ambient top bar button', async () => {
     Object.defineProperty(navigator, 'wakeLock', {
       value: {
-        request: jest.fn().mockResolvedValue({
+        request: vi.fn().mockResolvedValue({
           released: false,
-          release: jest.fn().mockResolvedValue(undefined),
-          addEventListener: jest.fn()
+          release: vi.fn().mockResolvedValue(undefined),
+          addEventListener: vi.fn()
         })
       },
       configurable: true,
@@ -436,11 +435,11 @@ describe('Home', () => {
     const { container } = render(<Home />);
 
     // Add 2 hands so deleting 1 leaves hands > 0 to trigger confirm reset
-    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
     fireEvent.click(screen.getByText('+25'));
     fireEvent.click(screen.getByText(/Anotar \+25 pts/i));
 
-    fireEvent.click(container.querySelector('#usAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Nosotros/i }));
     fireEvent.click(screen.getByText('+10'));
     fireEvent.click(screen.getByText(/Anotar \+10 pts/i));
 
@@ -474,7 +473,7 @@ describe('Home', () => {
     expect(screen.getByRole('button', { name: /Ajustes \(Meta: 200\)/i })).toBeTruthy();
 
     // Add 100 pts to Ellos (still below 200)
-    fireEvent.click(container.querySelector('#themAddScoreBtn'));
+    fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
     fireEvent.click(screen.getByText('+50'));
     fireEvent.click(screen.getByText('+50'));
     fireEvent.click(screen.getByText(/Anotar \+100 pts/i));

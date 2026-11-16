@@ -1,17 +1,27 @@
-import { h } from 'preact';
 import { useState, useEffect, useLayoutEffect, useRef } from 'preact/hooks';
 import { triggerHaptic } from '../utils/hardware';
-import { useEscapeKey } from '../utils/useEscapeKey';
+import { useDialog } from '../hooks/useDialog';
 import './ScoreInputDrawer.css';
 
 const QUICK_PRESETS = [5, 10, 15, 20, 25, 30, 40, 50];
 
+/**
+ * @param {{
+ *   isOpen: boolean,
+ *   teamName?: string,
+ *   teamEmoji?: string,
+ *   maxScore?: number,
+ *   returnFocusRef?: import('preact').RefObject<HTMLElement | null>,
+ *   onClose: () => void,
+ *   onSubmit: (score: number) => void
+ * }} props
+ */
 export default function ScoreInputDrawer({
 	isOpen,
 	teamName = 'Equipo',
 	teamEmoji = '',
 	maxScore = 168,
-	returnFocusRef,
+	returnFocusRef = undefined,
 	onClose,
 	onSubmit
 }) {
@@ -23,14 +33,14 @@ export default function ScoreInputDrawer({
 	const currentDragY = useRef(0);
 	const closeButtonRef = useRef(null);
 
-	useEscapeKey(isOpen, onClose);
+	const { dialogRef, handleBackdropClick } = useDialog(isOpen, onClose);
 
 	useLayoutEffect(() => {
 		if (!isOpen) return;
 		const trigger = returnFocusRef?.current ?? document.activeElement;
 		closeButtonRef.current.focus({ preventScroll: true });
 		return () => {
-			if (trigger?.isConnected) trigger.focus({ preventScroll: true });
+			if (trigger instanceof HTMLElement && trigger.isConnected) trigger.focus({ preventScroll: true });
 		};
 	}, [isOpen, returnFocusRef]);
 
@@ -146,7 +156,13 @@ export default function ScoreInputDrawer({
 	const numValue = parseInt(value, 10) || 0;
 
 	return (
-		<div class="drawerBackdrop" onClick={onClose} role="dialog" aria-modal="true" aria-label={`Sumar puntos a ${teamName}`}>
+		<dialog
+			ref={dialogRef}
+			class="drawerBackdrop"
+			onClick={handleBackdropClick}
+			aria-modal="true"
+			aria-label={`Sumar puntos a ${teamName}`}
+		>
 			<div
 				class="drawerContainer"
 				onClick={(e) => e.stopPropagation()}
@@ -239,6 +255,6 @@ export default function ScoreInputDrawer({
 					Anotar +{numValue || 0} pts
 				</button>
 			</div>
-		</div>
+		</dialog>
 	);
 }

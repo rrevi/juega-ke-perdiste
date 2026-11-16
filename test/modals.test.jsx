@@ -1,5 +1,4 @@
-import { expect } from 'expect';
-import { h } from 'preact';
+import { describe, test, expect, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/preact';
 import ConfirmModal from '../src/components/ConfirmModal';
 import SettingsModal from '../src/components/SettingsModal';
@@ -7,14 +6,14 @@ import SettingsModal from '../src/components/SettingsModal';
 describe('ConfirmModal', () => {
   test('should return null when isOpen is false', () => {
     const { container } = render(
-      <ConfirmModal isOpen={false} onConfirm={jest.fn()} onCancel={jest.fn()} />
+      <ConfirmModal isOpen={false} onConfirm={vi.fn()} onCancel={vi.fn()} />
     );
     expect(container.innerHTML).toBe('');
   });
 
   test('should render default texts and call onConfirm and onCancel', () => {
-    const handleConfirm = jest.fn();
-    const handleCancel = jest.fn();
+    const handleConfirm = vi.fn();
+    const handleCancel = vi.fn();
 
     render(
       <ConfirmModal
@@ -41,14 +40,14 @@ describe('ConfirmModal', () => {
 describe('SettingsModal', () => {
   test('should return null when isOpen is false', () => {
     const { container } = render(
-      <SettingsModal isOpen={false} onSave={jest.fn()} onClose={jest.fn()} />
+      <SettingsModal isOpen={false} onSave={vi.fn()} onClose={vi.fn()} />
     );
     expect(container.innerHTML).toBe('');
   });
 
   test('should render, allow changing win score and save', () => {
-    const handleSave = jest.fn();
-    const handleClose = jest.fn();
+    const handleSave = vi.fn();
+    const handleClose = vi.fn();
 
     render(
       <SettingsModal
@@ -76,8 +75,8 @@ describe('SettingsModal', () => {
   });
 
   test('should allow customizing team names and emojis and closing', () => {
-    const handleSave = jest.fn();
-    const handleClose = jest.fn();
+    const handleSave = vi.fn();
+    const handleClose = vi.fn();
 
     render(
       <SettingsModal
@@ -92,14 +91,14 @@ describe('SettingsModal', () => {
 
     // Edit Team 1 Name
     const team1Input = screen.getByPlaceholderText('Equipo 1');
-    fireEvent.change(team1Input, { target: { value: 'Águilas' } });
+    fireEvent.input(team1Input, { target: { value: 'Águilas' } });
 
     // Select Team 1 Emoji
     fireEvent.click(screen.getByText('🦁'));
 
     // Edit Team 2 Name
     const team2Input = screen.getByPlaceholderText('Equipo 2');
-    fireEvent.change(team2Input, { target: { value: 'Tigres' } });
+    fireEvent.input(team2Input, { target: { value: 'Tigres' } });
 
     // Select Team 2 Emoji
     fireEvent.click(screen.getByText('🐉'));
@@ -118,8 +117,8 @@ describe('SettingsModal', () => {
   });
 
   test('should fallback to default team names when empty, and close on backdrop click', () => {
-    const handleSave = jest.fn();
-    const handleClose = jest.fn();
+    const handleSave = vi.fn();
+    const handleClose = vi.fn();
 
     render(
       <SettingsModal
@@ -130,9 +129,9 @@ describe('SettingsModal', () => {
     );
 
     const team1Input = screen.getByPlaceholderText('Equipo 1');
-    fireEvent.change(team1Input, { target: { value: '   ' } });
+    fireEvent.input(team1Input, { target: { value: '   ' } });
     const team2Input = screen.getByPlaceholderText('Equipo 2');
-    fireEvent.change(team2Input, { target: { value: '   ' } });
+    fireEvent.input(team2Input, { target: { value: '   ' } });
 
     fireEvent.click(screen.getByText('Guardar'));
     expect(handleSave).toHaveBeenCalledWith({
@@ -151,11 +150,11 @@ describe('SettingsModal', () => {
   });
 
   test('should close ConfirmModal on Escape key', () => {
-    const handleCancel = jest.fn();
+    const handleCancel = vi.fn();
     render(
       <ConfirmModal
         isOpen={true}
-        onConfirm={jest.fn()}
+        onConfirm={vi.fn()}
         onCancel={handleCancel}
       />
     );

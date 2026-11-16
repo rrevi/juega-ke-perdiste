@@ -1,4 +1,4 @@
-import { expect } from 'expect';
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import HandModel from '../src/models/HandModel';
 
 describe('HandModel', () => {
@@ -31,7 +31,7 @@ describe('HandModel', () => {
 
   test('should add hands, persist, and notify subscribers', () => {
     const model = new HandModel('test-hands');
-    const subscriber = jest.fn();
+    const subscriber = vi.fn();
     const unsubscribe = model.subscribe(subscriber);
 
     model.add(25, 0);
@@ -67,7 +67,7 @@ describe('HandModel', () => {
 
   test('should dispose listeners', () => {
     const model = new HandModel('test-hands');
-    const subscriber = jest.fn();
+    const subscriber = vi.fn();
     model.subscribe(subscriber);
     model.dispose();
     model.inform();

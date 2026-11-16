@@ -1,25 +1,15 @@
-import { expect } from 'expect';
-import { h } from 'preact';
+import { describe, test, expect, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/preact';
 import ScoreInputDrawer from '../src/components/ScoreInputDrawer';
 
 describe('ScoreInputDrawer', () => {
-  beforeAll(() => {
-    if (typeof window !== 'undefined' && window.HTMLElement) {
-      window.HTMLElement.prototype.ontouchstart = null;
-      window.HTMLElement.prototype.ontouchmove = null;
-      window.HTMLElement.prototype.ontouchend = null;
-    }
-  });
-
   test('should render when isOpen is true and handle keypad & preset clicks', () => {
-    const handleSubmit = jest.fn();
-    const handleClose = jest.fn();
+    const handleSubmit = vi.fn();
+    const handleClose = vi.fn();
 
     const { rerender } = render(
       <ScoreInputDrawer
         isOpen={false}
-        team="them"
         teamName="Ellos"
         teamEmoji="🦅"
         onClose={handleClose}
@@ -32,7 +22,6 @@ describe('ScoreInputDrawer', () => {
     rerender(
       <ScoreInputDrawer
         isOpen={true}
-        team="them"
         teamName="Ellos"
         teamEmoji="🦅"
         onClose={handleClose}
@@ -56,11 +45,10 @@ describe('ScoreInputDrawer', () => {
     render(
       <ScoreInputDrawer
         isOpen={true}
-        team="us"
         teamName="Nosotros"
         teamEmoji="🐅"
-        onClose={jest.fn()}
-        onSubmit={jest.fn()}
+        onClose={vi.fn()}
+        onSubmit={vi.fn()}
       />
     );
 
@@ -75,19 +63,18 @@ describe('ScoreInputDrawer', () => {
 
     // Click clear -> 0
     fireEvent.click(screen.getByRole('button', { name: 'C' }));
-    expect(screen.getByText('Anotar +0 pts').disabled).toBe(true);
+    expect(/** @type {HTMLButtonElement} */ (screen.getByText('Anotar +0 pts')).disabled).toBe(true);
   });
 
   test('should show error and disable save when score exceeds max score', () => {
     render(
       <ScoreInputDrawer
         isOpen={true}
-        team="them"
         teamName="Ellos"
         teamEmoji="🦅"
         maxScore={168}
-        onClose={jest.fn()}
-        onSubmit={jest.fn()}
+        onClose={vi.fn()}
+        onSubmit={vi.fn()}
       />
     );
 
@@ -97,20 +84,19 @@ describe('ScoreInputDrawer', () => {
     fireEvent.click(screen.getByRole('button', { name: '0' }));
 
     expect(screen.getByText(/Máximo: 168 pts/i)).toBeTruthy();
-    expect(screen.getByText('Anotar +200 pts').disabled).toBe(true);
+    expect(/** @type {HTMLButtonElement} */ (screen.getByText('Anotar +200 pts')).disabled).toBe(true);
   });
 
   test('should cap at max score when preset overflows and close on ✕', () => {
-    const handleClose = jest.fn();
+    const handleClose = vi.fn();
     render(
       <ScoreInputDrawer
         isOpen={true}
-        team="us"
         teamName="Nosotros"
         teamEmoji="🐅"
         maxScore={168}
         onClose={handleClose}
-        onSubmit={jest.fn()}
+        onSubmit={vi.fn()}
       />
     );
 
@@ -130,15 +116,14 @@ describe('ScoreInputDrawer', () => {
   });
 
   test('should defensively guard against saving zero or overflow if button is clicked', () => {
-    const handleSubmit = jest.fn();
+    const handleSubmit = vi.fn();
     render(
       <ScoreInputDrawer
         isOpen={true}
-        team="them"
         teamName="Ellos"
         teamEmoji="🦅"
         maxScore={100}
-        onClose={jest.fn()}
+        onClose={vi.fn()}
         onSubmit={handleSubmit}
       />
     );
@@ -161,15 +146,14 @@ describe('ScoreInputDrawer', () => {
   });
 
   test('should dismiss drawer on swipe down beyond threshold and spring back on small drag', () => {
-    const handleClose = jest.fn();
+    const handleClose = vi.fn();
     const { container } = render(
       <ScoreInputDrawer
         isOpen={true}
-        team="them"
         teamName="Ellos"
         teamEmoji="🦅"
         onClose={handleClose}
-        onSubmit={jest.fn()}
+        onSubmit={vi.fn()}
       />
     );
 

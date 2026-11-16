@@ -1,11 +1,10 @@
-import { expect } from 'expect';
-import { h } from 'preact';
+import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/preact';
 import Hand from '../src/components/Hand';
 
 describe('Hand component', () => {
   test('should render hand with default index when index is omitted', () => {
-    const onRemove = jest.fn();
+    const onRemove = vi.fn();
     const hand = { _id: '1', themScore: 15, usScore: 0 };
     render(
       <table>

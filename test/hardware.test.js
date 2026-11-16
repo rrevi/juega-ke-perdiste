@@ -1,4 +1,4 @@
-import { expect } from 'expect';
+import { describe, test, expect, vi, afterEach } from 'vitest';
 import {
   isWakeLockSupported,
   isWakeLockActive,
@@ -20,11 +20,15 @@ describe('hardware utils', () => {
       delete navigator.vibrate;
     }
     if (originalWakeLock !== undefined) {
-      navigator.wakeLock = originalWakeLock;
+      Object.defineProperty(navigator, 'wakeLock', {
+        value: originalWakeLock,
+        configurable: true,
+        writable: true
+      });
     } else {
-      delete navigator.wakeLock;
+      Reflect.deleteProperty(navigator, 'wakeLock');
     }
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('isWakeLockSupported', () => {
@@ -38,21 +42,21 @@ describe('hardware utils', () => {
     });
 
     test('should return false when wakeLock is absent', () => {
-      delete navigator.wakeLock;
+      Reflect.deleteProperty(navigator, 'wakeLock');
       expect(isWakeLockSupported()).toBe(false);
     });
   });
 
   describe('requestWakeLock and releaseWakeLock', () => {
     test('should request wake lock and release it safely', async () => {
-      const releaseMock = jest.fn().mockResolvedValue(undefined);
+      const releaseMock = vi.fn().mockResolvedValue(undefined);
       const sentinel = {
         released: false,
         release: releaseMock,
-        addEventListener: jest.fn()
+        addEventListener: vi.fn()
       };
 
-      const requestMock = jest.fn().mockResolvedValue(sentinel);
+      const requestMock = vi.fn().mockResolvedValue(sentinel);
       Object.defineProperty(navigator, 'wakeLock', {
         value: { request: requestMock },
         configurable: true,
@@ -74,10 +78,10 @@ describe('hardware utils', () => {
     });
 
     test('should handle requestWakeLock rejection gracefully', async () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       Object.defineProperty(navigator, 'wakeLock', {
         value: {
-          request: jest.fn().mockRejectedValue(new Error('Permission denied'))
+          request: vi.fn().mockRejectedValue(new Error('Permission denied'))
         },
         configurable: true,
         writable: true
@@ -89,20 +93,20 @@ describe('hardware utils', () => {
     });
 
     test('should return false from requestWakeLock when wakeLock is not supported', async () => {
-      delete navigator.wakeLock;
+      Reflect.deleteProperty(navigator, 'wakeLock');
       const acquired = await requestWakeLock();
       expect(acquired).toBe(false);
     });
 
     test('should handle releaseWakeLock rejection gracefully', async () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const sentinel = {
         released: false,
-        release: jest.fn().mockRejectedValueOnce(new Error('Release failed')).mockResolvedValue(undefined),
-        addEventListener: jest.fn()
+        release: vi.fn().mockRejectedValueOnce(new Error('Release failed')).mockResolvedValue(undefined),
+        addEventListener: vi.fn()
       };
       Object.defineProperty(navigator, 'wakeLock', {
-        value: { request: jest.fn().mockResolvedValue(sentinel) },
+        value: { request: vi.fn().mockResolvedValue(sentinel) },
         configurable: true,
         writable: true
       });
@@ -121,18 +125,18 @@ describe('hardware utils', () => {
       let releaseListener = null;
       const sentinel = {
         released: false,
-        release: jest.fn().mockImplementation(async () => {
+        release: vi.fn().mockImplementation(async () => {
           sentinel.released = true;
           if (releaseListener) releaseListener();
         }),
-        addEventListener: jest.fn((evt, cb) => {
+        addEventListener: vi.fn((evt, cb) => {
           if (evt === 'release') releaseListener = cb;
         })
       };
 
       Object.defineProperty(navigator, 'wakeLock', {
         value: {
-          request: jest.fn(async () => {
+          request: vi.fn(async () => {
             sentinel.released = false;
             return sentinel;
           })
@@ -141,7 +145,7 @@ describe('hardware utils', () => {
         writable: true
       });
 
-      const listener = jest.fn();
+      const listener = vi.fn();
       const unsubscribe = onWakeLockChange(listener);
 
       expect(isWakeLockActive()).toBe(false);
@@ -167,15 +171,15 @@ describe('hardware utils', () => {
 
   describe('toggleWakeLock', () => {
     test('should toggle wake lock active state', async () => {
-      const releaseMock = jest.fn().mockResolvedValue(undefined);
+      const releaseMock = vi.fn().mockResolvedValue(undefined);
       const sentinel = {
         released: false,
         release: releaseMock,
-        addEventListener: jest.fn()
+        addEventListener: vi.fn()
       };
 
       Object.defineProperty(navigator, 'wakeLock', {
-        value: { request: jest.fn().mockResolvedValue(sentinel) },
+        value: { request: vi.fn().mockResolvedValue(sentinel) },
         configurable: true,
         writable: true
       });
@@ -194,18 +198,18 @@ describe('hardware utils', () => {
 
     test('should release a pending lock when toggled off before it is granted', async () => {
       let resolveRequest;
-      const request = jest.fn(() => new Promise(resolve => { resolveRequest = resolve; }));
+      const request = vi.fn(() => new Promise(resolve => { resolveRequest = resolve; }));
       const sentinel = {
         released: false,
-        release: jest.fn().mockResolvedValue(undefined),
-        addEventListener: jest.fn()
+        release: vi.fn().mockResolvedValue(undefined),
+        addEventListener: vi.fn()
       };
       Object.defineProperty(navigator, 'wakeLock', {
         value: { request },
         configurable: true,
         writable: true
       });
-      const listener = jest.fn();
+      const listener = vi.fn();
       const unsubscribe = onWakeLockChange(listener);
 
       const enabling = toggleWakeLock();
@@ -226,15 +230,15 @@ describe('hardware utils', () => {
       let resolveRelease;
       const firstLock = {
         released: false,
-        release: jest.fn(() => new Promise(resolve => { resolveRelease = resolve; })),
-        addEventListener: jest.fn()
+        release: vi.fn(() => new Promise(resolve => { resolveRelease = resolve; })),
+        addEventListener: vi.fn()
       };
       const secondLock = {
         released: false,
-        release: jest.fn().mockResolvedValue(undefined),
-        addEventListener: jest.fn()
+        release: vi.fn().mockResolvedValue(undefined),
+        addEventListener: vi.fn()
       };
-      const request = jest.fn().mockResolvedValueOnce(firstLock).mockResolvedValueOnce(secondLock);
+      const request = vi.fn().mockResolvedValueOnce(firstLock).mockResolvedValueOnce(secondLock);
       Object.defineProperty(navigator, 'wakeLock', {
         value: { request },
         configurable: true,
@@ -261,7 +265,7 @@ describe('hardware utils', () => {
 
   describe('triggerHaptic', () => {
     test('should call navigator.vibrate with correct patterns for all haptic types', () => {
-      const vibrateMock = jest.fn();
+      const vibrateMock = vi.fn();
       navigator.vibrate = vibrateMock;
 
       triggerHaptic('tap');
@@ -279,7 +283,7 @@ describe('hardware utils', () => {
       triggerHaptic('error');
       expect(vibrateMock).toHaveBeenLastCalledWith([50, 40, 50]);
 
-      triggerHaptic('unknown_type');
+      triggerHaptic(/** @type {any} */ ('unknown_type'));
       expect(vibrateMock).toHaveBeenLastCalledWith(10);
     });
 
@@ -289,7 +293,7 @@ describe('hardware utils', () => {
     });
 
     test('should catch and suppress vibration exceptions', () => {
-      navigator.vibrate = jest.fn().mockImplementation(() => {
+      navigator.vibrate = vi.fn().mockImplementation(() => {
         throw new Error('Vibrate blocked');
       });
       expect(() => triggerHaptic('tap')).not.toThrow();

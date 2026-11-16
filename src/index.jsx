@@ -1,5 +1,4 @@
-import { render } from 'preact';
-import { LocationProvider, Router } from 'preact-iso';
+import { LocationProvider, Router, hydrate, prerender as ssr } from 'preact-iso';
 
 import { Header } from './components/Header.jsx';
 import Home from './pages/Home/index.jsx';
@@ -12,6 +11,7 @@ export function App() {
 			<Header />
 			<main>
 				<Router>
+					<Home path="/" />
 					<Home path="/juega-ke-perdiste" />
 					<NotFound default />
 				</Router>
@@ -20,4 +20,10 @@ export function App() {
 	);
 }
 
-render(<App />, document.getElementById('app'));
+if (typeof window !== 'undefined') {
+	hydrate(<App />, document.getElementById('app'));
+}
+
+export async function prerender(data) {
+	return await ssr(<App {...data} />);
+}

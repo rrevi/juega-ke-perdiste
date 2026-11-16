@@ -1,6 +1,5 @@
-import { h } from "preact";
-
-export default function Hand({ hand, index, onRemove }) {
+/** @param {{ hand: { _id?: string, themScore: number, usScore: number }, index?: number, onRemove: () => void }} props */
+export default function Hand({ hand, index = undefined, onRemove }) {
 	const themWon = hand.themScore > 0;
 	const usWon = hand.usScore > 0;
 

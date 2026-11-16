@@ -1,6 +1,5 @@
-import { h } from 'preact';
 import { triggerHaptic } from '../utils/hardware';
-import { useEscapeKey } from '../utils/useEscapeKey';
+import { useDialog } from '../hooks/useDialog';
 import './ConfirmModal.css';
 
 export default function ConfirmModal({
@@ -13,7 +12,7 @@ export default function ConfirmModal({
 	onConfirm,
 	onCancel
 }) {
-	useEscapeKey(isOpen, onCancel);
+	const { dialogRef, handleBackdropClick } = useDialog(isOpen, onCancel);
 
 	if (!isOpen) return null;
 
@@ -28,7 +27,13 @@ export default function ConfirmModal({
 	};
 
 	return (
-		<div class="modalBackdrop" onClick={handleCancel} role="dialog" aria-modal="true" aria-label={title}>
+		<dialog
+			ref={dialogRef}
+			class="modalBackdrop"
+			onClick={handleBackdropClick}
+			aria-modal="true"
+			aria-label={title}
+		>
 			<div class="modalContainer" onClick={(e) => e.stopPropagation()}>
 				<h3 class="modalTitle">{title}</h3>
 				<p class="modalMessage">{message}</p>
@@ -45,6 +50,6 @@ export default function ConfirmModal({
 					</button>
 				</div>
 			</div>
-		</div>
+		</dialog>
 	);
 }

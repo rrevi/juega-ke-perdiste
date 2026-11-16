@@ -6,8 +6,14 @@
 		"noEmit": true,
 		"allowJs": true,
 		"checkJs": true,
+		"strict": false,
+		"skipLibCheck": true,
+		"maxNodeModuleJsDepth": 0,
+		"noUncheckedSideEffectImports": false,
+		"types": ["vite/client"],
 		"jsx": "react-jsx",
 		"jsxImportSource": "preact"
 	},
-	"include": ["node_modules/vite/client.d.ts", "**/*"]
+	"include": ["src/**/*", "test/**/*", "vite.config.js"],
+	"exclude": ["node_modules", "dist", "coverage", "dev-dist"]
 }

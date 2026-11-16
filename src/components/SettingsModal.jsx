@@ -1,7 +1,6 @@
-import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { triggerHaptic } from '../utils/hardware';
-import { useEscapeKey } from '../utils/useEscapeKey';
+import { useDialog } from '../hooks/useDialog';
 import './SettingsModal.css';
 
 const WIN_SCORE_OPTIONS = [100, 150, 200, 250, 500];
@@ -32,7 +31,7 @@ export default function SettingsModal({
 		}
 	}, [isOpen, currentWinScore, team1, team2]);
 
-	useEscapeKey(isOpen, onClose);
+	const { dialogRef, handleBackdropClick } = useDialog(isOpen, onClose);
 
 	if (!isOpen) return null;
 
@@ -47,7 +46,13 @@ export default function SettingsModal({
 	};
 
 	return (
-		<div class="settingsBackdrop" onClick={onClose} role="dialog" aria-modal="true" aria-label="Ajustes">
+		<dialog
+			ref={dialogRef}
+			class="settingsBackdrop"
+			onClick={handleBackdropClick}
+			aria-modal="true"
+			aria-label="Ajustes"
+		>
 			<div class="settingsContainer" onClick={(e) => e.stopPropagation()}>
 				<div class="settingsHeader">
 					<h3 class="settingsTitle">⚙️ Ajustes</h3>
@@ -85,7 +90,7 @@ export default function SettingsModal({
 								type="text"
 								class="teamNameInput"
 								value={team1Name}
-								onChange={(e) => setTeam1Name(e.target.value)}
+								onInput={(e) => setTeam1Name(e.currentTarget.value)}
 								placeholder="Equipo 1"
 								maxLength={20}
 							/>
@@ -115,7 +120,7 @@ export default function SettingsModal({
 								type="text"
 								class="teamNameInput"
 								value={team2Name}
-								onChange={(e) => setTeam2Name(e.target.value)}
+								onInput={(e) => setTeam2Name(e.currentTarget.value)}
 								placeholder="Equipo 2"
 								maxLength={20}
 							/>
@@ -144,6 +149,6 @@ export default function SettingsModal({
 					</button>
 				</div>
 			</div>
-		</div>
+		</dialog>
 	);
 }

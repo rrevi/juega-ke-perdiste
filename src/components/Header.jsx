@@ -1,7 +1,7 @@
-import { h } from 'preact';
 import DominoLogo from './DominoLogo';
 
-export function Header({ rightAction }) {
+/** @param {{ rightAction?: import('preact').ComponentChildren }} [props] */
+export function Header({ rightAction = null } = {}) {
 	return (
 		<header class="appHeader">
 			<div class="headerContent">

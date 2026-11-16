@@ -1,5 +1,4 @@
-import { expect } from 'expect';
-import { h } from 'preact';
+import { describe, test, expect } from 'vitest';
 import { render, screen } from '@testing-library/preact';
 import { Header } from '../src/components/Header';
 

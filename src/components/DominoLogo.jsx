@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { triggerHaptic } from '../utils/hardware';
 import './DominoLogo.css';
 

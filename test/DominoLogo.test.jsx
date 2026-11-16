@@ -1,15 +1,21 @@
-import { expect } from 'expect';
-import { h } from 'preact';
+import { describe, test, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/preact';
 import DominoLogo from '../src/components/DominoLogo';
 
 describe('DominoLogo', () => {
+  const originalVibrate = navigator.vibrate;
+
+  afterEach(() => {
+    if (originalVibrate !== undefined) {
+      navigator.vibrate = originalVibrate;
+    } else {
+      delete navigator.vibrate;
+    }
+  });
+
   test('should render JKP! domino tiles logo and trigger click haptic', () => {
-    const vibrateMock = jest.fn();
-    Object.defineProperty(global, 'navigator', {
-      value: { vibrate: vibrateMock },
-      configurable: true
-    });
+    const vibrateMock = vi.fn();
+    navigator.vibrate = vibrateMock;
 
     render(<DominoLogo />);
 

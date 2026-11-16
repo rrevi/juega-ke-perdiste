@@ -10,8 +10,7 @@ import './style.css';
 
 const MAX_HAND_SCORE = 168;
 
-/** @param {{ path?: string }} [_props] */
-export default function Home(_props) {
+export default function Home() {
 	const {
 		hands,
 		winScore,

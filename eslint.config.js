@@ -4,5 +4,6 @@ export default [
 	{
 		ignores: ['dist/**', 'dev-dist/**', 'coverage/**']
 	},
+	{ files: ['**/*.jsx'] },
 	...preact
 ];

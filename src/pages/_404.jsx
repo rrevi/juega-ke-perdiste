@@ -1,5 +1,4 @@
-/** @param {{ default?: boolean }} [_props] */
-export default function NotFound(_props) {
+export default function NotFound() {
 	return (
 		<section>
 			<h1>404: No encontrado</h1>

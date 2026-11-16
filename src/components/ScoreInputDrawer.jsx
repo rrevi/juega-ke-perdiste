@@ -159,13 +159,10 @@ export default function ScoreInputDrawer({
 			aria-label={`Sumar puntos a ${teamName}`}
 		>
 			<div
-				class="drawerContainer"
+				class={isDragging ? 'drawerContainer isDragging' : 'drawerContainer'}
 				onClick={(e) => e.stopPropagation()}
 				onKeyDown={handleKeyDown}
-				style={isDragging || dragY !== 0 ? {
-					transform: `translateY(${Math.max(0, dragY)}px)`,
-					transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
-				} : undefined}
+				style={dragY > 0 ? { transform: `translateY(${dragY}px)` } : undefined}
 			>
 				<div
 					class="drawerDragHandleArea"

@@ -1,4 +1,4 @@
-import { LocationProvider, Router, hydrate, prerender as ssr } from 'preact-iso';
+import { LocationProvider, Route, Router, hydrate, prerender as ssr } from 'preact-iso';
 
 import { Header } from './components/Header.jsx';
 import Home from './pages/Home/index.jsx';
@@ -11,9 +11,9 @@ export function App() {
 			<Header />
 			<main>
 				<Router>
-					<Home path="/" />
-					<Home path="/juega-ke-perdiste" />
-					<NotFound default />
+					<Route path="/" component={Home} />
+					<Route path="/juega-ke-perdiste" component={Home} />
+					<Route default component={NotFound} />
 				</Router>
 			</main>
 		</LocationProvider>

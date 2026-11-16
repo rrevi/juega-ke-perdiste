@@ -80,7 +80,7 @@ describe('Home', () => {
   });
 
   test('should add 🦅 hand via drawer and preset', async () => {
-    const { container } = render(<Home />);
+    render(<Home />);
 
     // Click "+ Ellos" button to open score drawer
     const themBtn = screen.getByRole('button', { name: /\+ Ellos/i });
@@ -99,7 +99,7 @@ describe('Home', () => {
   });
 
   test('should add 🐅 hand via drawer and keypad', async () => {
-    const { container } = render(<Home />);
+    render(<Home />);
 
     // Click "+ Nosotros" button to open score drawer
     const usBtn = screen.getByRole('button', { name: /\+ Nosotros/i });
@@ -119,7 +119,7 @@ describe('Home', () => {
   });
 
   test('should clear all hands after "↻" button is clicked and confirmed', async () => {
-    const { container } = render(<Home />);
+    render(<Home />);
 
     // Add a hand for Ellos (+25)
     fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
@@ -143,7 +143,7 @@ describe('Home', () => {
   });
 
   test('should remove a hand after "-" button is clicked', async () => {
-    const { container } = render(<Home />);
+    render(<Home />);
 
     // Add hand 1 (+10 to Ellos)
     fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
@@ -219,7 +219,7 @@ describe('Home', () => {
   });
 
   test('should trigger winner banner when Ellos reach winScore, show stats, and dismiss on Escape', async () => {
-    const { container } = render(<Home />);
+    render(<Home />);
 
     // Change winScore to 100
     fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
@@ -253,7 +253,7 @@ describe('Home', () => {
   });
 
   test('should trigger winner banner when Nosotros win and dismiss on "Continuar"', async () => {
-    const { container } = render(<Home />);
+    render(<Home />);
 
     // Change winScore to 100
     fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
@@ -318,7 +318,7 @@ describe('Home', () => {
       writable: true
     });
 
-    const { container } = render(<Home />);
+    render(<Home />);
 
     // Change winScore to 100
     fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
@@ -358,7 +358,7 @@ describe('Home', () => {
       writable: true
     });
 
-    const { container } = render(<Home />);
+    render(<Home />);
 
     // Change winScore to 100
     fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
@@ -385,7 +385,7 @@ describe('Home', () => {
   });
 
   test('should trap focus with Tab and Shift+Tab in winner modal', async () => {
-    const { container } = render(<Home />);
+    render(<Home />);
 
     // Change winScore to 100
     fireEvent.click(screen.getByRole('button', { name: /Ajustes/i }));
@@ -420,7 +420,7 @@ describe('Home', () => {
   });
 
   test('should show undo snackbar when a hand is removed and restore it on Deshacer click', async () => {
-    const { container } = render(<Home />);
+    render(<Home />);
 
     // Add hand (+25 to Ellos)
     fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
@@ -513,7 +513,7 @@ describe('Home', () => {
   });
 
   test('should clear undo snackbar on game reset', async () => {
-    const { container } = render(<Home />);
+    render(<Home />);
 
     // Add 2 hands so deleting 1 leaves hands > 0 to trigger confirm reset
     fireEvent.click(screen.getByRole('button', { name: /\+ Ellos/i }));
@@ -547,7 +547,7 @@ describe('Home', () => {
     localStorage.setItem('jkp-win-score', '0');
     localStorage.setItem('jkp-team1', 'null');
 
-    const { container } = render(<Home />);
+    render(<Home />);
 
     // Default fallback team1 and winScore=200 (not an instant win at 0)
     expect(screen.queryByRole('dialog', { name: 'Anuncio de ganador' })).toBeNull();
